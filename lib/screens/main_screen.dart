@@ -24,7 +24,7 @@ class MainScreen extends StatelessWidget {
                       child: const FadeInImage(
                           placeholder: AssetImage('assets/perfilusuario.png'),
                           image: AssetImage('assets/perfilusuario.png'))),
-                  const cuadradoDelMedio(),
+                  const CuadradoDelMedio(),
                 ],
               ),
             ]
@@ -34,8 +34,8 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-class cuadradoDelMedio extends StatelessWidget {
-  const cuadradoDelMedio({
+class CuadradoDelMedio extends StatelessWidget {
+  const CuadradoDelMedio({
     super.key,
   });
 
