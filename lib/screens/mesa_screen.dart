@@ -1,6 +1,10 @@
 import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:prueba_widgets/providers/salas_provider.dart';
+import 'package:prueba_widgets/screens/home_screen.dart';
+import 'package:prueba_widgets/screens/main_screen.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
 import 'package:sweet_nav_bar/sweet_nav_bar.dart';
 
@@ -13,20 +17,38 @@ class MesaScreen extends StatefulWidget {
   State<MesaScreen> createState() => _MesaScreenState();
 }
 
-class _MesaScreenState extends State<MesaScreen> {
+class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
 
   /* Variables */
 
   //----- Int -----
   int index = 1;
 
+  //----- Strings -----
+  String mesaNombre = '';
+
+  /* Métodos */
+  void getList() async {
+    SalasProvider salasProvider = Provider.of<SalasProvider>(context);
+
+    setState(() {
+      mesaNombre = salasProvider.heroMesa;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    getList();
+  }
+
+  /* Overrides */
+
+
+
   @override
   Widget build(BuildContext context) {
-    final List args = ModalRoute
-        .of(context)
-        ?.settings
-        .arguments as List;
-
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Hero(
@@ -50,12 +72,15 @@ class _MesaScreenState extends State<MesaScreen> {
           onTap: (index) {
             setState(() {
               this.index = index;
+              if(index == 1){
+                Navigator.pushNamed(context, HomeScreen.routeName);
+              }
             });
           },
         ),
       ),
       appBar: AppBar(
-        title: Text('${args[0]}',
+        title: Text(mesaNombre,
             style: GoogleFonts.titanOne(
               color: Colors.black87,
               fontSize: 12,
@@ -65,32 +90,35 @@ class _MesaScreenState extends State<MesaScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            CustomFuncyCard(
-              maxHeight: 200,
-              gradientColors: const [
-                Color.fromARGB(255, 44, 216, 255),
-                Color.fromARGB(255, 103, 235, 255)
-              ],
-              boxShadowColor: Colors.transparent,
-              image: 'assets/comida-sana.png',
-              roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
-              textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-              textColor: Colors.white,
-              title: Text(
-                'Último artículo',
-                style: GoogleFonts.titanOne(
-                    color: Colors.white,
-                    fontSize: 15,
-                    shadows: const [
-                      Shadow(color: Colors.orangeAccent, blurRadius: 20)
-                    ]
-                ),
-              ),
-              child: Column(
-                children: [
-                  const Divider(),
-                  Text('Cocacola', style: GoogleFonts.manjari(fontSize: 15),),
+            Hero(
+              tag: mesaNombre,
+              child: CustomFuncyCard(
+                maxHeight: 200,
+                gradientColors: const [
+                  Color.fromARGB(255, 44, 216, 255),
+                  Color.fromARGB(255, 103, 235, 255)
                 ],
+                boxShadowColor: Colors.transparent,
+                image: 'assets/comida-sana.png',
+                roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+                textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+                textColor: Colors.white,
+                title: Text(
+                  'Último artículo',
+                  style: GoogleFonts.titanOne(
+                      color: Colors.white,
+                      fontSize: 15,
+                      shadows: const [
+                        Shadow(color: Colors.orangeAccent, blurRadius: 20)
+                      ]
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const Divider(),
+                    Text('Cocacola', style: GoogleFonts.manjari(fontSize: 15),),
+                  ],
+                ),
               ),
             ),
             Column(

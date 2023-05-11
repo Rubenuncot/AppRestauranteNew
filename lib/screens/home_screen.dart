@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
+import 'package:prueba_widgets/screens/mesa_screen.dart';
 import 'package:prueba_widgets/screens/salas_screen.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
 
@@ -30,9 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //-----Boleanos-----
   bool navigateSala = false;
+  bool navigateMesa= false;
 
   //-----Strings-----
   String salaSeleccionada = '';
+  String ultimaSala = '';
 
   /* Métodos */
   void showDialogMenu() {
@@ -224,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedItems: (selectedItems) {
         for(var x in selectedItems){
           setState(() {
-            salaSeleccionada = x.value!;
+            Provider.of<SalasProvider>(context, listen: false).salaSeleccionada = x.value!;
             navigateSala = true;
           });
         }
@@ -233,24 +236,39 @@ class _HomeScreenState extends State<HomeScreen> {
     )).showModal(context);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ultimaSala = Provider.of<SalasProvider>(context).heroMesa;
+  }
+
   /* Overrides */
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     list = [
-      const ListElement(
-        gradientColors: [
-          Color.fromARGB(255, 44, 216, 255),
-          Color.fromARGB(255, 103, 235, 255)
-        ],
-        boxShadowColor: Color.fromARGB(255, 0, 211, 148),
-        subTitle: '',
-        title: 'Regresar',
-        image: 'assets/volver.png',
-        roundedBoxColor: Color.fromARGB(166, 184, 255, 255),
-        textShadowColor: Color.fromARGB(255, 168, 252, 255),
-        textColor: Colors.white,
+      Hero(
+        tag: Provider.of<SalasProvider>(context).heroMesa,
+        child: ListElement(
+          onTap: () {
+            setState(() {
+              navigateMesa = true;
+
+            });
+          },
+          gradientColors: [
+            Color.fromARGB(255, 44, 216, 255),
+            Color.fromARGB(255, 103, 235, 255)
+          ],
+          boxShadowColor: Color.fromARGB(255, 0, 211, 148),
+          subTitle: '',
+          title: 'Regresar',
+          image: 'assets/volver.png',
+          roundedBoxColor: Color.fromARGB(166, 184, 255, 255),
+          textShadowColor: Color.fromARGB(255, 168, 252, 255),
+          textColor: Colors.white,
+        ),
       ),
       ListElement(
         gradientColors: const [
@@ -335,8 +353,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if(navigateSala){
-        Navigator.pushNamed(context, SalaScreen.routeName, arguments: [salaSeleccionada]);
+        Navigator.pushNamed(context, SalaScreen.routeName);
         navigateSala = false;
+      }
+      if(navigateMesa){
+        Navigator.pushNamed(context, MesaScreen.routeName);
+        navigateMesa = false;
       }
     });
 
@@ -362,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   duration: const Duration(milliseconds: 300),
                   child: Text(
-                      'Última mesa atendida: ${Provider.of<SalasProvider>(context).salaActual}'),
+                      'Última mesa atendida: ${Provider.of<SalasProvider>(context).heroMesa}'),
                 ),
                 background: Container(
                     decoration: const BoxDecoration(
