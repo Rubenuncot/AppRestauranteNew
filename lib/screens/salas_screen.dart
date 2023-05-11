@@ -52,7 +52,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
     for(var x = 0; x < 10; x++){
       cards.add(
           Hero(
-            tag: Provider.of<SalasProvider>(context, listen: false).heroMesa == '' ? x == 0 ? '' : '$salaActual${x+1}' : '$salaActual${x+1}',
+            tag: Provider.of<SalasProvider>(context, listen: false).heroMesa == '' || Provider.of<SalasProvider>(context, listen: false).heroMesa.contains(salaActual)  ? x == 0 ? '' : '$salaActual${x+1}' : '$salaActual${x+1}',
             child: CustomFuncyCard(
               maxHeight: 250,
               maxWidth: 150,
