@@ -335,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if(navigateSala){
-        Navigator.pushNamed(context, MesaScreen.routeName, arguments: [salaSeleccionada]);
+        Navigator.pushNamed(context, SalaScreen.routeName, arguments: [salaSeleccionada]);
         navigateSala = false;
       }
     });

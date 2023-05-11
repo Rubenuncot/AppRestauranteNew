@@ -18,6 +18,11 @@ class RoutesList {
         screen: const HomeScreen(),
         route: HomeScreen.routeName),
     MenuOption(
+        name: SalaScreen.routeName,
+        icon: Icons.list,
+        screen: const SalaScreen(),
+        route: SalaScreen.routeName),
+    MenuOption(
         name: MesaScreen.routeName,
         icon: Icons.list,
         screen: const MesaScreen(),

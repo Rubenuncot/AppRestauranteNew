@@ -1,3 +1,5 @@
+export 'package:prueba_widgets/screens/mesa_screen.dart';
+
 export 'package:prueba_widgets/screens/home_screen.dart';
 
 export 'package:prueba_widgets/screens/salas_screen.dart';
