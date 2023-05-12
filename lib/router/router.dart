@@ -32,6 +32,11 @@ class RoutesList {
         icon: Icons.list,
         screen: const SettingsScreen(),
         route: SettingsScreen.routeName),
+    MenuOption(
+        name: BookingScreen.routeName,
+        icon: Icons.list,
+        screen: const BookingScreen(),
+        route: BookingScreen.routeName),
   ];
 
   static Map<String, Widget Function(BuildContext)> getAppRoutes() {

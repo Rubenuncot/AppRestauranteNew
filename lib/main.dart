@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/providers/booking_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/router/router.dart';
 
@@ -10,6 +11,9 @@ void main() async {
     providers: [
       ChangeNotifierProvider(
         create: (context) => SalasProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => BookingProvider(),
       ),
     ],
     child: const MyApp(),

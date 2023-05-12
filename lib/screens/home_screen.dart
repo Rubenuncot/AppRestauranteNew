@@ -6,10 +6,12 @@ import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/database/models/models.dart';
+import 'package:prueba_widgets/database/services/db_service.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
-import 'package:prueba_widgets/screens/mesa_screen.dart';
-import 'package:prueba_widgets/screens/salas_screen.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
+
+import 'screens.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = '_home';
@@ -21,7 +23,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   /* Variables */
   //-----Variables de widgets-----
   late ScrollController _scrollController;
@@ -31,7 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //-----Boleanos-----
   bool navigateSala = false;
-  bool navigateMesa= false;
+  bool navigateMesa = false;
+  bool navigateReserva = false;
 
   //-----Strings-----
   String salaSeleccionada = '';
@@ -217,23 +219,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  showDialogSalas() {
+  showDialogSalas(int i) {
     DropDownState(DropDown(
-        data: [
-      SelectedListItem(name: 'Terraza', value: 'Terraza'),
-      SelectedListItem(name: 'Salón', value: 'Salón'),
-      SelectedListItem(name: 'Barra', value: 'Barra'),
-    ],
+      data: [
+        SelectedListItem(name: 'Terraza', value: 'Terraza'),
+        SelectedListItem(name: 'Salón', value: 'Salón'),
+        SelectedListItem(name: 'Barra', value: 'Barra'),
+      ],
       selectedItems: (selectedItems) {
-        for(var x in selectedItems){
-          setState(() {
-            Provider.of<SalasProvider>(context, listen: false).salaSeleccionada = x.value!;
-            navigateSala = true;
-          });
+        switch (i) {
+          case 1:
+            for (var x in selectedItems) {
+              setState(() {
+                Provider.of<SalasProvider>(context, listen: false)
+                    .salaSeleccionada = x.value!;
+                navigateSala = true;
+              });
+            }
+            break;
+          case 2:
+            for (var x in selectedItems) {
+              setState(() {
+                Provider.of<SalasProvider>(context, listen: false)
+                    .salaSeleccionada = x.value!;
+                navigateReserva = true;
+              });
+            }
+            break;
         }
       },
-
     )).showModal(context);
+  }
+
+  insertarRegistro() async {
+  }
+
+  printRegistro() async {
   }
 
   @override
@@ -249,24 +270,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController = ScrollController();
     list = [
       Hero(
-        tag: Provider.of<SalasProvider>(context).heroMesa,
+        tag: Provider.of<SalasProvider>(context, listen: false).heroMesa,
         child: ListElement(
           onTap: () {
             setState(() {
               navigateMesa = true;
-
             });
           },
-          gradientColors: [
+          gradientColors: const [
             Color.fromARGB(255, 44, 216, 255),
             Color.fromARGB(255, 103, 235, 255)
           ],
-          boxShadowColor: Color.fromARGB(255, 0, 211, 148),
+          boxShadowColor: const Color.fromARGB(255, 0, 211, 148),
           subTitle: '',
           title: 'Regresar',
           image: 'assets/volver.png',
-          roundedBoxColor: Color.fromARGB(166, 184, 255, 255),
-          textShadowColor: Color.fromARGB(255, 168, 252, 255),
+          roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+          textShadowColor: const Color.fromARGB(255, 168, 252, 255),
           textColor: Colors.white,
         ),
       ),
@@ -282,7 +302,9 @@ class _HomeScreenState extends State<HomeScreen> {
         roundedBoxColor: const Color.fromARGB(166, 184, 255, 185),
         textShadowColor: const Color.fromARGB(255, 171, 255, 168),
         textColor: Colors.white,
-        onTap: showDialogSalas,
+        onTap: () {
+          showDialogSalas(1);
+        },
       ),
       ListElement(
         gradientColors: const [
@@ -298,46 +320,50 @@ class _HomeScreenState extends State<HomeScreen> {
         textColor: Colors.white,
         onTap: showDialogMenu,
       ),
-      const ListElement(
-        gradientColors: [
+      ListElement(
+        gradientColors: const [
           Color.fromARGB(255, 112, 90, 255),
           Color.fromARGB(255, 161, 85, 255)
         ],
-        boxShadowColor: Color.fromARGB(255, 158, 0, 211),
+        boxShadowColor: const Color.fromARGB(255, 158, 0, 211),
         subTitle: '',
         title: 'Carta',
         image: 'assets/carta.png',
-        roundedBoxColor: Color.fromARGB(166, 216, 184, 255),
-        textShadowColor: Color.fromARGB(255, 193, 168, 255),
+        roundedBoxColor: const Color.fromARGB(166, 216, 184, 255),
+        textShadowColor: const Color.fromARGB(255, 193, 168, 255),
         textColor: Colors.white,
+        onTap: insertarRegistro,
       ),
-      const ListElement(
-        gradientColors: [
+      ListElement(
+        gradientColors: const [
           Color.fromARGB(255, 255, 98, 98),
           Color.fromARGB(255, 255, 150, 115)
         ],
         boxShadowColor: Colors.orangeAccent,
         subTitle: '',
-        // subTitle: 'Día: ${DateTime.now().day < 10 ? '0${DateTime.now().day}' : DateTime.now().day} / ${DateTime.now().month < 10 ? '0${DateTime.now().month}' : DateTime.now().month} / ${DateTime.now().year}',
         title: 'Reservas',
         image: 'assets/calendario.png',
-        roundedBoxColor: Color.fromARGB(155, 255, 129, 129),
-        textShadowColor: Color.fromARGB(255, 255, 150, 115),
+        roundedBoxColor: const Color.fromARGB(155, 255, 129, 129),
+        textShadowColor: const Color.fromARGB(255, 255, 150, 115),
         textColor: Colors.white,
+        onTap: () {
+          showDialogSalas(2);
+        },
       ),
-      const ListElement(
-        gradientColors: [
+      ListElement(
+        gradientColors: const [
           Color.fromARGB(255, 255, 98, 218),
           Color.fromARGB(255, 255, 115, 164)
         ],
-        boxShadowColor: Color.fromARGB(255, 211, 0, 162),
+        boxShadowColor: const Color.fromARGB(255, 211, 0, 162),
         subTitle: '',
         // subTitle: 'Día: ${DateTime.now().day < 10 ? '0${DateTime.now().day}' : DateTime.now().day} / ${DateTime.now().month < 10 ? '0${DateTime.now().month}' : DateTime.now().month} / ${DateTime.now().year}',
         title: 'Ajustes',
         image: 'assets/ajustes.png',
-        roundedBoxColor: Color.fromARGB(155, 255, 129, 238),
-        textShadowColor: Color.fromARGB(255, 255, 25, 80),
+        roundedBoxColor: const Color.fromARGB(155, 255, 129, 238),
+        textShadowColor: const Color.fromARGB(255, 255, 25, 80),
         textColor: Colors.white,
+        onTap: printRegistro,
       ),
     ];
   }
@@ -350,15 +376,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      if(navigateSala){
+      if (navigateSala) {
         Navigator.pushNamed(context, SalaScreen.routeName);
         navigateSala = false;
       }
-      if(navigateMesa){
+      if (navigateMesa) {
         Navigator.pushNamed(context, MesaScreen.routeName);
         navigateMesa = false;
+      }
+      if (navigateReserva) {
+        Navigator.pushNamed(context, BookingScreen.routeName);
+        navigateReserva = false;
       }
     });
 
