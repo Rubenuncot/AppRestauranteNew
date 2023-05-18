@@ -17,8 +17,7 @@ class MesaScreen extends StatefulWidget {
   State<MesaScreen> createState() => _MesaScreenState();
 }
 
-class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
-
+class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
   /* Variables */
 
   //----- Int -----
@@ -45,8 +44,6 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
 
   /* Overrides */
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +55,8 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
           paddingBackgroundColor: Colors.transparent,
           items: [
             SweetNavBarItem(
-                sweetIcon: const Icon(Icons.calendar_month), sweetLabel: 'Ver Comanda'),
+                sweetIcon: const Icon(Icons.calendar_month),
+                sweetLabel: 'Ver Comanda'),
             SweetNavBarItem(
                 sweetActive: const Icon(Icons.home),
                 sweetIcon: const Icon(
@@ -67,12 +65,13 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
                 sweetLabel: 'Home',
                 sweetBackground: Colors.transparent),
             SweetNavBarItem(
-                sweetIcon: const Icon(Icons.send), sweetLabel: 'Enviar Comanda'),
+                sweetIcon: const Icon(Icons.send),
+                sweetLabel: 'Enviar Comanda'),
           ],
           onTap: (index) {
             setState(() {
               this.index = index;
-              if(index == 1){
+              if (index == 1) {
                 Navigator.pushNamed(context, HomeScreen.routeName);
               }
             });
@@ -110,13 +109,15 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
                       fontSize: 15,
                       shadows: const [
                         Shadow(color: Colors.orangeAccent, blurRadius: 20)
-                      ]
-                  ),
+                      ]),
                 ),
                 child: Column(
                   children: [
                     const Divider(),
-                    Text('Cocacola', style: GoogleFonts.manjari(fontSize: 15),),
+                    Text(
+                      'Cocacola',
+                      style: GoogleFonts.manjari(fontSize: 15),
+                    ),
                   ],
                 ),
               ),
@@ -125,10 +126,8 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  constraints: BoxConstraints(maxHeight: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.7),
+                  constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.7),
                   child: Stack(
                     children: [
                       DynamicHeightGridView(
@@ -144,23 +143,24 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver{
                               ],
                               boxShadowColor: Colors.orangeAccent,
                               image: 'assets/lata-de-refresco.png',
-                              roundedBoxColor: const Color.fromARGB(
-                                  166, 184, 255, 255),
-                              textShadowColor: const Color.fromARGB(
-                                  255, 168, 252, 255),
+                              roundedBoxColor:
+                                  const Color.fromARGB(166, 184, 255, 255),
+                              textShadowColor:
+                                  const Color.fromARGB(255, 168, 252, 255),
                               textColor: Colors.white,
-                              child: Text('Refrescos',
+                              child: Text(
+                                'Refrescos',
                                 style: GoogleFonts.titanOne(
                                     color: Colors.white,
                                     fontSize: 20,
                                     shadows: const [
-                                      Shadow(color: Colors.orangeAccent,
+                                      Shadow(
+                                          color: Colors.orangeAccent,
                                           blurRadius: 20)
-                                    ]
-                                ),),
+                                    ]),
+                              ),
                             );
-                          }
-                      ),
+                          }),
                     ],
                   ),
                 ),

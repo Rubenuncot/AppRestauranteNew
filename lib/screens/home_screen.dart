@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:carousel_animations/carousel_animations.dart';
 import 'package:drop_down_list/drop_down_list.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
+import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:prueba_widgets/database/models/models.dart';
-import 'package:prueba_widgets/database/services/db_service.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
 
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //-----Listas-----
   List<Widget> list = [];
+  List<Widget> listCarrousel = [];
 
   //-----Boleanos-----
   bool navigateSala = false;
@@ -38,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   //-----Strings-----
   String salaSeleccionada = '';
   String ultimaSala = '';
+  String salaActual = '';
+  String mesaActual = '';
 
   /* Métodos */
   void showDialogMenu() {
@@ -251,45 +255,64 @@ class _HomeScreenState extends State<HomeScreen> {
     )).showModal(context);
   }
 
-  insertarRegistro() async {
-  }
+  insertarRegistro() async {}
 
-  printRegistro() async {
-  }
+  printRegistro() async {}
+
+  /* Overrides */
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     ultimaSala = Provider.of<SalasProvider>(context).heroMesa;
+    SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
+    _scrollController = ScrollController();
+    listCarrousel = [
+      for (var x = 0; x < salasProvider.nombresMesas.length; x++)
+        Expanded(
+          child: Hero(
+            tag: salasProvider.heroMesa == '' ||
+                salasProvider.heroMesa.contains(salaActual)
+                ? x == 0
+                ? ''
+                : salasProvider.nombresMesas[x]
+                : salasProvider.nombresMesas[x],
+            child: CustomFuncyCard(
+              maxHeight: 250,
+              maxWidth: 150,
+              onTap: () {
+                setState(() {
+                  mesaActual = salasProvider.nombresMesas[x];
+                  salasProvider.heroMesa = mesaActual;
+                  navigateMesa = true;
+                });
+              },
+              gradientColors: salasProvider.colors[x],
+              boxShadowColor: Colors.orangeAccent,
+              image: salasProvider.iconoStr[x],
+              roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+              textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+              textColor: Colors.white,
+              child: Text(
+                salasProvider.nombresMesas[x],
+                style: GoogleFonts.titanOne(
+                    color: Colors.white,
+                    fontSize: 20,
+                    shadows: const [
+                      Shadow(color: Colors.orangeAccent, blurRadius: 20)
+                    ]),
+              ),
+            ),
+          ),
+        ),
+    ];
   }
 
-  /* Overrides */
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     list = [
-      Hero(
-        tag: Provider.of<SalasProvider>(context, listen: false).heroMesa,
-        child: ListElement(
-          onTap: () {
-            setState(() {
-              navigateMesa = true;
-            });
-          },
-          gradientColors: const [
-            Color.fromARGB(255, 44, 216, 255),
-            Color.fromARGB(255, 103, 235, 255)
-          ],
-          boxShadowColor: const Color.fromARGB(255, 0, 211, 148),
-          subTitle: '',
-          title: 'Regresar',
-          image: 'assets/volver.png',
-          roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
-          textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-          textColor: Colors.white,
-        ),
-      ),
       ListElement(
         gradientColors: const [
           Color.fromARGB(255, 104, 255, 44),
@@ -299,7 +322,6 @@ class _HomeScreenState extends State<HomeScreen> {
         subTitle: '',
         title: 'Salas',
         image: 'assets/silla.png',
-        roundedBoxColor: const Color.fromARGB(166, 184, 255, 185),
         textShadowColor: const Color.fromARGB(255, 171, 255, 168),
         textColor: Colors.white,
         onTap: () {
@@ -315,7 +337,6 @@ class _HomeScreenState extends State<HomeScreen> {
         subTitle: '',
         title: 'Menú del Día',
         image: 'assets/menuDelDia.png',
-        roundedBoxColor: const Color.fromARGB(166, 255, 246, 184),
         textShadowColor: const Color.fromARGB(255, 255, 248, 168),
         textColor: Colors.white,
         onTap: showDialogMenu,
@@ -329,7 +350,6 @@ class _HomeScreenState extends State<HomeScreen> {
         subTitle: '',
         title: 'Carta',
         image: 'assets/carta.png',
-        roundedBoxColor: const Color.fromARGB(166, 216, 184, 255),
         textShadowColor: const Color.fromARGB(255, 193, 168, 255),
         textColor: Colors.white,
         onTap: insertarRegistro,
@@ -343,7 +363,6 @@ class _HomeScreenState extends State<HomeScreen> {
         subTitle: '',
         title: 'Reservas',
         image: 'assets/calendario.png',
-        roundedBoxColor: const Color.fromARGB(155, 255, 129, 129),
         textShadowColor: const Color.fromARGB(255, 255, 150, 115),
         textColor: Colors.white,
         onTap: () {
@@ -360,7 +379,6 @@ class _HomeScreenState extends State<HomeScreen> {
         // subTitle: 'Día: ${DateTime.now().day < 10 ? '0${DateTime.now().day}' : DateTime.now().day} / ${DateTime.now().month < 10 ? '0${DateTime.now().month}' : DateTime.now().month} / ${DateTime.now().year}',
         title: 'Ajustes',
         image: 'assets/ajustes.png',
-        roundedBoxColor: const Color.fromARGB(155, 255, 129, 238),
         textShadowColor: const Color.fromARGB(255, 255, 25, 80),
         textColor: Colors.white,
         onTap: printRegistro,
@@ -391,56 +409,73 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Curved AppBar',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        body: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 300.0,
-              floating: true,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                title: AnimatedDefaultTextStyle(
-                  style: GoogleFonts.titanOne(
-                    color: Colors.black87,
-                    fontSize: 12,
+    return Scaffold(
+      body: SafeArea(
+          child: Container(
+        constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+            minWidth: MediaQuery.of(context).size.width),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Mesas Recientes', style: GoogleFonts.hammersmithOne(color: Colors.white, shadows: const [Shadow(color: Colors.black, blurRadius: 20)], fontSize: 25),),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: listCarrousel.isNotEmpty ? MediaQuery.of(context).size.height * 0.3 : MediaQuery.of(context).size.height * 0.2,
+                  child: listCarrousel.isNotEmpty ?
+                      ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: listCarrousel.length,
+                        itemBuilder: (context, index) => SizedBox( width: MediaQuery.of(context).size.width * 0.4, child: listCarrousel[index]),)
+                      : CustomContainer(
+                    image: 'assets/ajustes.png',
+                    gradientColors: [Colors.orange, Colors.yellow],
+                    textShadowColor: Colors.white,
+                    boxShadowColor: Colors.white,
+                    textColor: Colors.black,
+                    title: SizedBox(width: MediaQuery.of(context).size.width *0.6,
+                        child: Text('Aún no se han atendido mesas', style: GoogleFonts.hammersmithOne(fontSize: 15),)),
                   ),
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                      'Última mesa atendida: ${Provider.of<SalasProvider>(context).heroMesa}'),
                 ),
-                background: Container(
-                    decoration: const BoxDecoration(
-                        borderRadius:
-                            BorderRadius.vertical(bottom: Radius.circular(20))),
-                    child: const ClipRRect(
-                        borderRadius:
-                            BorderRadius.vertical(bottom: Radius.circular(20)),
-                        child: FadeInImage(
-                          image: AssetImage('assets/restaurante.jpg'),
-                          placeholder: AssetImage('assets/restaurante.jpg'),
-                          fit: BoxFit.cover,
-                        ))),
-              ),
-              backgroundColor: Colors.transparent,
+              ],
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return Container(color: Colors.white, child: list[index]);
-                },
-                childCount: list.length,
-              ),
+            const SizedBox(
+              height: 20,
             ),
+            CustomContainer(
+                image: 'assets/perfilusuario.png',
+                gradientColors: const [Colors.blueGrey, Colors.blueAccent],
+                textShadowColor: Colors.white,
+                boxShadowColor: Colors.yellowAccent,
+                textColor: Colors.black,
+              title: SizedBox(width: MediaQuery.of(context).size.width *0.6,
+                  child: Text('Última mesa atendida: $salaSeleccionada', style: GoogleFonts.hammersmithOne(fontSize: 15),)),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: FlexibleGridView(
+                axisCount: GridLayoutEnum.twoElementsInRow,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                children: List.generate(
+                  list.length,
+                      (index) => Center(
+                        child: list[index]
+                      ),
+                ),
+              ),
+            )
           ],
         ),
-      ),
+      )),
     );
   }
 }
@@ -453,7 +488,6 @@ class ListElement extends StatelessWidget {
   final List<Color> gradientColors;
   final Color textShadowColor;
   final Color boxShadowColor;
-  final Color roundedBoxColor;
   final Color textColor;
   final double sizedBox;
   final dynamic Function()? onTap;
@@ -466,7 +500,6 @@ class ListElement extends StatelessWidget {
     required this.gradientColors,
     required this.textShadowColor,
     required this.boxShadowColor,
-    required this.roundedBoxColor,
     required this.textColor,
     this.sizedBox = 50,
     this.onTap,
@@ -474,56 +507,16 @@ class ListElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomFuncyCard(
+    return CustomContainer(
       image: image,
       gradientColors: gradientColors,
       textShadowColor: textShadowColor,
       boxShadowColor: boxShadowColor,
-      roundedBoxColor: roundedBoxColor,
       textColor: textColor,
       onTap: onTap,
-      title: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.titanOne(
-                    color: textColor,
-                    fontSize: 20,
-                    shadows: [
-                      Shadow(
-                          color: textShadowColor,
-                          blurRadius: 10,
-                          offset: const Offset(5, 2))
-                    ]),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text(
-                subTitle,
-                style: GoogleFonts.titanOne(
-                    color: textColor,
-                    fontSize: 15,
-                    shadows: [
-                      Shadow(
-                          color: textShadowColor,
-                          blurRadius: 10,
-                          offset: const Offset(5, 2))
-                    ]),
-              )
-            ],
-          ),
-        ],
-      ),
+      maxWidth: 150,
+      maxHeight: 250,
+      child: Text(title, style: GoogleFonts.hammersmithOne(fontSize: 15),),
     );
   }
 }

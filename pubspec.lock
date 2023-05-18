@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.6"
+  carousel_animations:
+    dependency: "direct main"
+    description:
+      name: carousel_animations
+      sha256: "188eee17501a45ac8bba6ae6d246c31ffb75fe916baf6bbcf06f7ba84a3ef925"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   characters:
     dependency: transitive
     description:
@@ -105,6 +113,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.4"
+  flexible_grid_view:
+    dependency: "direct main"
+    description:
+      name: flexible_grid_view
+      sha256: c837b55628e5177c8ceedd5b9eef04c5a360b2b855e07742657f5bbbe0f45167
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   fluid_dialog:
     dependency: "direct main"
     description:

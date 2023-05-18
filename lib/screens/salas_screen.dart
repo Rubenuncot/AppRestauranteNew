@@ -17,8 +17,7 @@ class SalaScreen extends StatefulWidget {
   State<SalaScreen> createState() => _SalaScreenState();
 }
 
-class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
-
+class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
   /* Variables */
 
   //----- Lists -----
@@ -36,51 +35,90 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
   String mesaActual = '';
   String heroTag = '';
 
-
   /* Métodos */
-  void getLists(){
+  void getLists() {
     SalasProvider salasProvider = Provider.of<SalasProvider>(context);
 
-    for( var x in salas){
-      if(x == salasProvider.salaSeleccionada){
+    for (var x in salas) {
+      if (x == salasProvider.salaSeleccionada) {
         setState(() {
-          salaActual = x.substring(0,1);
+          salaActual = x.substring(0, 1);
+          switch (salaActual) {
+            case 'T':
+              salasProvider.setIcons('assets/terraza.png');
+              salasProvider.setColors(const [
+                Color.fromARGB(255, 93, 255, 182),
+                Color.fromARGB(255, 104, 255, 232)
+              ]);
+              break;
+            case 'S':
+              salasProvider.setIcons('assets/restaurante.png');
+              salasProvider.setColors(const [
+                Color.fromARGB(255, 255, 93, 93),
+                Color.fromARGB(255, 255, 190, 104)
+              ]);
+              break;
+            case 'B':
+              salasProvider.setIcons('assets/barra-de-bar.png');
+              salasProvider.setColors(const [
+                Color.fromARGB(255, 93, 158, 255),
+                Color.fromARGB(255, 104, 210, 255)
+              ]);
+              break;
+            default:
+              salasProvider.setIcons('assets/cena.png');
+              salasProvider.setColors(const [
+                Color.fromARGB(255, 152, 93, 255),
+                Color.fromARGB(255, 222, 104, 255)
+              ]);
+          }
         });
       }
     }
 
-    for(var x = 0; x < 10; x++){
-      cards.add(
-          Hero(
-            tag: Provider.of<SalasProvider>(context, listen: false).heroMesa == '' || Provider.of<SalasProvider>(context, listen: false).heroMesa.contains(salaActual)  ? x == 0 ? '' : '$salaActual${x+1}' : '$salaActual${x+1}',
-            child: CustomFuncyCard(
-              maxHeight: 250,
-              maxWidth: 150,
-              onTap: () {
-                setState(() {
-                  mesaActual = '$salaActual${x+1}';
-                  Provider.of<SalasProvider>(context, listen: false).heroMesa = mesaActual;
-                  navigateMesa = true;
-                });
-              },
-              gradientColors: const [
-                Color.fromARGB(255, 153, 94, 255),
-                Color.fromARGB(255, 212, 103, 255)
-              ],
-              boxShadowColor: Colors.orangeAccent,
-              image: 'assets/lata-de-refresco.png',
-              roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
-              textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-              textColor: Colors.white,
-              child: Text('$salaActual${x+1}',
-                style: GoogleFonts.titanOne(
-                    color: Colors.white,
-                    fontSize: 20,
-                    shadows: const [Shadow(color: Colors.orangeAccent, blurRadius: 20)]
-                ),),
-            ),
-          )
+    for (var x = 0; x < 10; x++) {
+      Hero hero = Hero(
+        tag:
+            Provider.of<SalasProvider>(context, listen: false).heroMesa == '' ||
+                    Provider.of<SalasProvider>(context, listen: false)
+                        .heroMesa
+                        .contains(salaActual)
+                ? x == 0
+                    ? ''
+                    : '$salaActual${x + 1}'
+                : '$salaActual${x + 1}',
+        child: CustomFuncyCard(
+          maxHeight: 250,
+          maxWidth: 150,
+          onTap: () {
+            SalasProvider salasProvider =
+                Provider.of<SalasProvider>(context, listen: false);
+            setState(() {
+              mesaActual = '$salaActual${x + 1}';
+              salasProvider.heroMesa = mesaActual;
+              navigateMesa = true;
+              salasProvider.setNames('$salaActual${x + 1}');
+            });
+          },
+          gradientColors: salasProvider.colors[salasProvider.colors.length - 1],
+          boxShadowColor: Colors.orangeAccent,
+          image: salasProvider.iconoStr[salasProvider.iconoStr.length - 1],
+          roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+          textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+          textColor: Colors.white,
+          child: Text(
+            '$salaActual${x + 1}',
+            style: GoogleFonts.titanOne(
+                color: Colors.white,
+                fontSize: 20,
+                shadows: const [
+                  Shadow(color: Colors.orangeAccent, blurRadius: 20)
+                ]),
+          ),
+        ),
       );
+
+      cards.add(hero);
     }
   }
 
@@ -91,19 +129,16 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
     setState(() {
       getLists();
     });
-
   }
 
   /* Overrides */
 
-
-
   @override
   Widget build(BuildContext context) {
-
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      if(navigateMesa){
-        Navigator.pushNamed(context, MesaScreen.routeName, arguments: [mesaActual]);
+      if (navigateMesa) {
+        Navigator.pushNamed(context, MesaScreen.routeName,
+            arguments: [mesaActual]);
         navigateMesa = false;
       }
     });
@@ -134,10 +169,10 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
                         ],
                         boxShadowColor: Colors.transparent,
                         image: 'assets/comida-sana.png',
-                        roundedBoxColor: const Color.fromARGB(
-                            166, 184, 255, 255),
-                        textShadowColor: const Color.fromARGB(
-                            255, 168, 252, 255),
+                        roundedBoxColor:
+                            const Color.fromARGB(166, 184, 255, 255),
+                        textShadowColor:
+                            const Color.fromARGB(255, 168, 252, 255),
                         textColor: Colors.white,
                         title: Text(
                           'Fuera de carta',
@@ -147,20 +182,25 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
                               shadows: const [
                                 Shadow(
                                     color: Colors.orangeAccent, blurRadius: 20)
-                              ]
-                          ),
+                              ]),
                         ),
                         child: Column(
                           children: [
                             const Divider(),
-                            Text('Ensala de marisco',
-                              style: GoogleFonts.manjari(fontSize: 15),),
+                            Text(
+                              'Ensala de marisco',
+                              style: GoogleFonts.manjari(fontSize: 15),
+                            ),
                             const Divider(),
-                            Text('Panecillos de rulo de cabra',
-                              style: GoogleFonts.manjari(fontSize: 15),),
+                            Text(
+                              'Panecillos de rulo de cabra',
+                              style: GoogleFonts.manjari(fontSize: 15),
+                            ),
                             const Divider(),
-                            Text('Chuletón de vaca',
-                              style: GoogleFonts.manjari(fontSize: 15),),
+                            Text(
+                              'Chuletón de vaca',
+                              style: GoogleFonts.manjari(fontSize: 15),
+                            ),
                           ],
                         ),
                       ),
@@ -174,10 +214,15 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
           elevation: 10,
           heroTag: 'NavigatorBar',
           child: const Icon(
-            Icons.outbond_outlined, color: Colors.orangeAccent, size: 30,),
+            Icons.outbond_outlined,
+            color: Colors.orangeAccent,
+            size: 30,
+          ),
         ),
         appBar: AppBar(
-          title: Text(Provider.of<SalasProvider>(context, listen: false).salaSeleccionada,
+          title: Text(
+              Provider.of<SalasProvider>(context, listen: false)
+                  .salaSeleccionada,
               style: GoogleFonts.titanOne(
                 color: Colors.black87,
                 fontSize: 12,
@@ -191,10 +236,8 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    constraints: BoxConstraints(maxHeight: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.9),
+                    constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.9),
                     child: Stack(
                       children: [
                         DynamicHeightGridView(
@@ -202,8 +245,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver{
                             crossAxisCount: 2,
                             builder: (context, index) {
                               return cards[index];
-                            }
-                        ),
+                            }),
                       ],
                     ),
                   ),
