@@ -23,6 +23,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
   //----- Lists -----
   List<Widget> cards = [];
   List<String> salas = ['Terraza', 'Salón', 'Barra'];
+  List<Color> colors = [];
 
   //----- Int -----
   int index = 1;
@@ -34,10 +35,12 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
   String salaActual = '';
   String mesaActual = '';
   String heroTag = '';
+  String iconStr = '';
 
   /* Métodos */
   void getLists() {
-    SalasProvider salasProvider = Provider.of<SalasProvider>(context);
+    SalasProvider salasProvider =
+        Provider.of<SalasProvider>(context, listen: false);
 
     for (var x in salas) {
       if (x == salasProvider.salaSeleccionada) {
@@ -45,32 +48,32 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
           salaActual = x.substring(0, 1);
           switch (salaActual) {
             case 'T':
-              salasProvider.setIcons('assets/terraza.png');
-              salasProvider.setColors(const [
+              iconStr = 'assets/terraza.png';
+              colors = const [
                 Color.fromARGB(255, 93, 255, 182),
                 Color.fromARGB(255, 104, 255, 232)
-              ]);
+              ];
               break;
             case 'S':
-              salasProvider.setIcons('assets/restaurante.png');
-              salasProvider.setColors(const [
+              iconStr = 'assets/restaurante.png';
+              colors = const [
                 Color.fromARGB(255, 255, 93, 93),
                 Color.fromARGB(255, 255, 190, 104)
-              ]);
+              ];
               break;
             case 'B':
-              salasProvider.setIcons('assets/barra-de-bar.png');
-              salasProvider.setColors(const [
+              iconStr = 'assets/barra-de-bar.png';
+              colors = const [
                 Color.fromARGB(255, 93, 158, 255),
                 Color.fromARGB(255, 104, 210, 255)
-              ]);
+              ];
               break;
             default:
-              salasProvider.setIcons('assets/cena.png');
-              salasProvider.setColors(const [
+              iconStr = 'assets/cena.png';
+              colors = const [
                 Color.fromARGB(255, 152, 93, 255),
                 Color.fromARGB(255, 222, 104, 255)
-              ]);
+              ];
           }
         });
       }
@@ -78,31 +81,28 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
 
     for (var x = 0; x < 10; x++) {
       Hero hero = Hero(
-        tag:
-            Provider.of<SalasProvider>(context, listen: false).heroMesa == '' ||
-                    Provider.of<SalasProvider>(context, listen: false)
-                        .heroMesa
-                        .contains(salaActual)
-                ? x == 0
-                    ? ''
-                    : '$salaActual${x + 1}'
-                : '$salaActual${x + 1}',
+        tag: salasProvider.heroMesa == '' ||
+                salasProvider.heroMesa.contains(salaActual)
+            ? x == 0
+                ? ''
+                : '$salaActual${x + 1}'
+            : '$salaActual${x + 1}',
         child: CustomFuncyCard(
           maxHeight: 250,
           maxWidth: 150,
           onTap: () {
-            SalasProvider salasProvider =
-                Provider.of<SalasProvider>(context, listen: false);
             setState(() {
               mesaActual = '$salaActual${x + 1}';
               salasProvider.heroMesa = mesaActual;
               navigateMesa = true;
               salasProvider.setNames('$salaActual${x + 1}');
+              salasProvider.setColors(colors);
+              salasProvider.setIcons(iconStr);
             });
           },
-          gradientColors: salasProvider.colors[salasProvider.colors.length - 1],
+          gradientColors: colors,
           boxShadowColor: Colors.orangeAccent,
-          image: salasProvider.iconoStr[salasProvider.iconoStr.length - 1],
+          image: iconStr,
           roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
           textShadowColor: const Color.fromARGB(255, 168, 252, 255),
           textColor: Colors.white,

@@ -28,7 +28,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
 
   /* Métodos */
   void getList() async {
-    SalasProvider salasProvider = Provider.of<SalasProvider>(context);
+    SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
 
     setState(() {
       mesaNombre = salasProvider.heroMesa;

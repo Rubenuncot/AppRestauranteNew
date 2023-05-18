@@ -264,44 +264,42 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    ultimaSala = Provider.of<SalasProvider>(context).heroMesa;
     SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
+    ultimaSala = salasProvider.heroMesa;
     _scrollController = ScrollController();
     listCarrousel = [
       for (var x = 0; x < salasProvider.nombresMesas.length; x++)
-        Expanded(
-          child: Hero(
-            tag: salasProvider.heroMesa == '' ||
-                salasProvider.heroMesa.contains(salaActual)
-                ? x == 0
-                ? ''
-                : salasProvider.nombresMesas[x]
-                : salasProvider.nombresMesas[x],
-            child: CustomFuncyCard(
-              maxHeight: 250,
-              maxWidth: 150,
-              onTap: () {
-                setState(() {
-                  mesaActual = salasProvider.nombresMesas[x];
-                  salasProvider.heroMesa = mesaActual;
-                  navigateMesa = true;
-                });
-              },
-              gradientColors: salasProvider.colors[x],
-              boxShadowColor: Colors.orangeAccent,
-              image: salasProvider.iconoStr[x],
-              roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
-              textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-              textColor: Colors.white,
-              child: Text(
-                salasProvider.nombresMesas[x],
-                style: GoogleFonts.titanOne(
-                    color: Colors.white,
-                    fontSize: 20,
-                    shadows: const [
-                      Shadow(color: Colors.orangeAccent, blurRadius: 20)
-                    ]),
-              ),
+        Hero(
+          tag: salasProvider.heroMesa == '' ||
+              salasProvider.heroMesa.contains(salaActual)
+              ? x == 0
+              ? ''
+              : salasProvider.nombresMesas[x]
+              : salasProvider.nombresMesas[x],
+          child: CustomFuncyCard(
+            maxHeight: 250,
+            maxWidth: 150,
+            onTap: () {
+              setState(() {
+                mesaActual = salasProvider.nombresMesas[x];
+                salasProvider.heroMesa = mesaActual;
+                navigateMesa = true;
+              });
+            },
+            gradientColors: salasProvider.colors[x],
+            boxShadowColor: Colors.orangeAccent,
+            image: salasProvider.iconoStr[x],
+            roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+            textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+            textColor: Colors.white,
+            child: Text(
+              salasProvider.nombresMesas[x],
+              style: GoogleFonts.titanOne(
+                  color: Colors.white,
+                  fontSize: 20,
+                  shadows: const [
+                    Shadow(color: Colors.orangeAccent, blurRadius: 20)
+                  ]),
             ),
           ),
         ),
@@ -432,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: listCarrousel.length,
-                        itemBuilder: (context, index) => SizedBox( width: MediaQuery.of(context).size.width * 0.4, child: listCarrousel[index]),)
+                        itemBuilder: (context, index) => SizedBox( width: MediaQuery.of(context).size.width * 0.4, child: listCarrousel.reversed.toList()[index]),)
                       : CustomContainer(
                     image: 'assets/ajustes.png',
                     gradientColors: [Colors.orange, Colors.yellow],
@@ -447,15 +445,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(
               height: 20,
-            ),
-            CustomContainer(
-                image: 'assets/perfilusuario.png',
-                gradientColors: const [Colors.blueGrey, Colors.blueAccent],
-                textShadowColor: Colors.white,
-                boxShadowColor: Colors.yellowAccent,
-                textColor: Colors.black,
-              title: SizedBox(width: MediaQuery.of(context).size.width *0.6,
-                  child: Text('Última mesa atendida: $salaSeleccionada', style: GoogleFonts.hammersmithOne(fontSize: 15),)),
             ),
             const SizedBox(
               height: 20,

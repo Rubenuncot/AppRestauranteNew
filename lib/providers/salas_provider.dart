@@ -7,6 +7,7 @@ class SalasProvider extends ChangeNotifier {
   List<String> iconoStr = [];
   List<List<Color>> colors = [];
   List<String> nombresMesas = [];
+  bool _notAdd = false;
 
   String get mesaActual => _mesaActual;
 
@@ -31,28 +32,34 @@ class SalasProvider extends ChangeNotifier {
 
 
   void setColors(List<Color> colors){
-    if(nombresMesas.length > 4){
-      colors.removeAt(0);
-    }
+    if(!_notAdd){
+      if (colors.length > 4) {
+        colors.removeAt(0);
+      }
 
-    this.colors.add(colors);
-    notifyListeners();
+      this.colors.add(colors);
+    }
   }
 
   void setNames(String name){
-
-    if(nombresMesas.length > 4){
-      nombresMesas.removeAt(0);
+    if(!nombresMesas.contains(name)){
+      if (nombresMesas.length > 4) {
+        nombresMesas.removeAt(0);
+      }
+      nombresMesas.add(name);
+      _notAdd = false;
+    } else {
+      _notAdd = true;
     }
-    nombresMesas.add(name);
-    notifyListeners();
+
   }
 
   setIcons(String icon){
-    if(nombresMesas.length > 4){
-      iconoStr.removeAt(0);
+    if(!_notAdd){
+      if (iconoStr.length > 4) {
+        iconoStr.removeAt(0);
+      }
+      iconoStr.add(icon);
     }
-    iconoStr.add(icon);
-    notifyListeners();
   }
 }
