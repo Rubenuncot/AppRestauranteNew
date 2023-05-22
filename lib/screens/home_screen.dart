@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:carousel_animations/carousel_animations.dart';
 import 'package:drop_down_list/drop_down_list.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
 
+import '../shared_preferences/preferences.dart';
 import 'screens.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool navigateSala = false;
   bool navigateMesa = false;
   bool navigateReserva = false;
+  bool waiting = false;
 
   //-----Strings-----
   String salaSeleccionada = '';
@@ -259,8 +260,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   printRegistro() async {}
 
-  /* Overrides */
+  Future<void> logOut() async {
+    await Future.delayed(const Duration(seconds: 3));
+    Preferences.saveLoginStateToPreferences(true);
+  }
 
+  /* Overrides */
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -309,6 +314,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
+    if(salasProvider.nombresMesas.isEmpty){
+      salasProvider.getLists(context);
+    }
+
     _scrollController = ScrollController();
     list = [
       ListElement(
@@ -379,7 +390,11 @@ class _HomeScreenState extends State<HomeScreen> {
         image: 'assets/ajustes.png',
         textShadowColor: const Color.fromARGB(255, 255, 25, 80),
         textColor: Colors.white,
-        onTap: printRegistro,
+        onTap: () {
+          setState(() {
+            waiting = true;
+          });
+        },
       ),
     ];
   }
@@ -407,64 +422,90 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    return Scaffold(
-      body: SafeArea(
-          child: Container(
-        constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-            minWidth: MediaQuery.of(context).size.width),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Mesas Recientes', style: GoogleFonts.hammersmithOne(color: Colors.white, shadows: const [Shadow(color: Colors.black, blurRadius: 20)], fontSize: 25),),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: listCarrousel.isNotEmpty ? MediaQuery.of(context).size.height * 0.3 : MediaQuery.of(context).size.height * 0.2,
-                  child: listCarrousel.isNotEmpty ?
-                      ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: listCarrousel.length,
-                        itemBuilder: (context, index) => SizedBox( width: MediaQuery.of(context).size.width * 0.4, child: listCarrousel.reversed.toList()[index]),)
-                      : CustomContainer(
-                    image: 'assets/ajustes.png',
-                    gradientColors: [Colors.orange, Colors.yellow],
-                    textShadowColor: Colors.white,
-                    boxShadowColor: Colors.white,
-                    textColor: Colors.black,
-                    title: SizedBox(width: MediaQuery.of(context).size.width *0.6,
-                        child: Text('Aún no se han atendido mesas', style: GoogleFonts.hammersmithOne(fontSize: 15),)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: FlexibleGridView(
-                axisCount: GridLayoutEnum.twoElementsInRow,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                children: List.generate(
-                  list.length,
-                      (index) => Center(
-                        child: list[index]
-                      ),
+
+
+    return FutureBuilder(
+      future: waiting ? logOut() : null,
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.waiting){
+          return Scaffold(
+            body: Container(
+              color: const Color.fromARGB(0, 225, 225, 225),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Cerrando Sesión...'),
+                    const SizedBox(height: 50,),
+                    LoadingAnimationWidget.halfTriangleDot(color: Colors.orangeAccent, size: 50),
+                  ],
                 ),
               ),
-            )
-          ],
-        ),
-      )),
+            ),
+          );
+        } else {
+          return Scaffold(
+            body: SafeArea(
+                child: Container(
+                  constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height,
+                      minWidth: MediaQuery.of(context).size.width),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Mesas Recientes', style: GoogleFonts.hammersmithOne(color: Colors.white, shadows: const [Shadow(color: Colors.black, blurRadius: 20)], fontSize: 25),),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: listCarrousel.isNotEmpty ? MediaQuery.of(context).size.height * 0.3 : MediaQuery.of(context).size.height * 0.2,
+                            child: listCarrousel.isNotEmpty ?
+                            ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: listCarrousel.length,
+                              itemBuilder: (context, index) => SizedBox( width: MediaQuery.of(context).size.width * 0.4, child: listCarrousel.reversed.toList()[index]),)
+                                : CustomContainer(
+                              image: 'assets/ajustes.png',
+                              gradientColors: const [Colors.orange, Colors.yellow],
+                              textShadowColor: Colors.white,
+                              boxShadowColor: Colors.white,
+                              textColor: Colors.black,
+                              title: SizedBox(width: MediaQuery.of(context).size.width *0.6,
+                                  child: Text('Aún no se han atendido mesas', style: GoogleFonts.hammersmithOne(fontSize: 15),)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Expanded(
+                        child: FlexibleGridView(
+                          axisCount: GridLayoutEnum.twoElementsInRow,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          children: List.generate(
+                            list.length,
+                                (index) => Center(
+                                child: list[index]
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )),
+          );
+        }
+      },
     );
   }
 }

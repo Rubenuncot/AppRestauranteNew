@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:prueba_widgets/shared_preferences/preferences.dart';
 
 import '../models/menu_option.dart';
 import '../screens/screens.dart';
 
 class RoutesList {
-  static String initialRoute = "_main";
+  static String initialRoute = Preferences.getLoginStateFromPreferences() ? "_main" : HomeScreen.routeName;
 
   static final menuOptions = <MenuOption>[
     MenuOption(

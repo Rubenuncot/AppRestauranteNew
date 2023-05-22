@@ -1,35 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:prueba_widgets/providers/log_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
+import 'package:prueba_widgets/shared_preferences/preferences.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   static String routeName = '_main';
 
   const MainScreen({Key? key}) : super(key: key);
 
   @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  Future<void> logIn() async{
+    await Future.delayed(const Duration(seconds: 3));
+    Preferences.saveLoginStateToPreferences(false);
+    Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: Stack(
-            children: [
-              const background(),
-              Column(
-                children: [
-                  Container(
-                      margin: const EdgeInsets.symmetric(vertical: 50),
-                      constraints: const BoxConstraints(maxHeight: 200),
-                      child: const FadeInImage(
-                          placeholder: AssetImage('assets/perfilusuario.png'),
-                          image: AssetImage('assets/perfilusuario.png'))),
-                  const CuadradoDelMedio(),
-                ],
+    return FutureBuilder(
+      future: Provider.of<LogProvider>(context).waiting ? logIn() : null,
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.waiting){
+          return Scaffold(
+            body: Container(
+              color: const Color.fromARGB(0, 225, 225, 225),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Iniciando Sesión...'),
+                    const SizedBox(height: 50,),
+                    LoadingAnimationWidget.halfTriangleDot(color: Colors.orangeAccent, size: 50),
+                  ],
+                ),
               ),
-            ]
-        ),
-      ),
+            ),
+          );
+        } else {
+          return Scaffold(
+            body: SizedBox(
+              height: double.infinity,
+              width: double.infinity,
+              child: Stack(
+                  children: [
+                    const background(),
+                    Column(
+                      children: [
+                        Container(
+                            margin: const EdgeInsets.symmetric(vertical: 50),
+                            constraints: const BoxConstraints(maxHeight: 200),
+                            child: const FadeInImage(
+                                placeholder: AssetImage('assets/perfilusuario.png'),
+                                image: AssetImage('assets/perfilusuario.png'))),
+                        const CuadradoDelMedio(),
+                      ],
+                    ),
+                  ]
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }
@@ -84,7 +123,19 @@ class CuadradoDelMedio extends StatelessWidget {
               child: MaterialButton(
                 onPressed: () {
                   // Todo: Poner lo de la lectura del código qr
-                  Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+
+                  // Provider.of<ApiProvider>(context, listen: false).responseJsonData('show',
+                  //     {'': ''});
+                  //
+                  // Provider.of<ApiProvider>(context, listen: false).responseJsonData('update',
+                  //     {
+                  //       'type' : '2',
+                  //       'id' : '1',
+                  //       'param' : 'cantidad',
+                  //       'value' : '2',
+                  //     });
+
+                  Provider.of<LogProvider>(context, listen: false).waiting = true;
                 },
                 padding: const EdgeInsets.all(20),
                 color: const Color.fromARGB(255, 38, 246, 246),
@@ -114,7 +165,7 @@ class background extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(gradient: LinearGradient(
           colors: [Colors.redAccent, Colors.white],
-          stops: const[0.4, 0.4],
+          stops: [0.4, 0.4],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter)),
     );

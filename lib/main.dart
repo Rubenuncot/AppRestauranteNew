@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/booking_provider.dart';
+import 'package:prueba_widgets/providers/log_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/router/router.dart';
+import 'package:prueba_widgets/shared_preferences/preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Preferences.init();
 
   runApp(MultiProvider(
     providers: [
@@ -15,6 +20,12 @@ void main() async {
       ChangeNotifierProvider(
         create: (context) => BookingProvider(),
       ),
+      ChangeNotifierProvider(
+        create: (context) => ApiProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => LogProvider(),
+      ),
     ],
     child: const MyApp(),
   ));
@@ -22,7 +33,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

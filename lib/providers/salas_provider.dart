@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prueba_widgets/shared_preferences/preferences.dart';
 
 class SalasProvider extends ChangeNotifier {
   String _mesaActual = 'S-254';
@@ -33,11 +34,12 @@ class SalasProvider extends ChangeNotifier {
 
   void setColors(List<Color> colors){
     if(!_notAdd){
-      if (colors.length > 4) {
-        colors.removeAt(0);
+      if (this.colors.length > 4) {
+        this.colors.removeAt(0);
       }
 
       this.colors.add(colors);
+      Preferences.saveColorsToPreferences(this.colors);
     }
   }
 
@@ -47,6 +49,7 @@ class SalasProvider extends ChangeNotifier {
         nombresMesas.removeAt(0);
       }
       nombresMesas.add(name);
+      Preferences.saveNameToPreferences(nombresMesas);
       _notAdd = false;
     } else {
       _notAdd = true;
@@ -60,6 +63,13 @@ class SalasProvider extends ChangeNotifier {
         iconoStr.removeAt(0);
       }
       iconoStr.add(icon);
+      Preferences.saveIconsToPreferences(iconoStr);
     }
+  }
+
+  void getLists(BuildContext context){
+    Preferences.getNamesFromPreferences(context);
+    Preferences.getIconsFromPreferences(context);
+    Preferences.getColorsFromPreferences(context);
   }
 }
