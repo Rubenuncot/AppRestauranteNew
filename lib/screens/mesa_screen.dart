@@ -1,9 +1,17 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:counter_slider/counter_slider.dart';
+import 'package:drop_down_list/drop_down_list.dart';
+import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_dialogs/dialogs.dart';
+import 'package:material_dialogs/shared/types.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
@@ -23,28 +31,78 @@ class MesaScreen extends StatefulWidget {
 class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
   /* Variables */
 
+  //----- Bool -----
+  bool openProductos = false;
+  bool openCounter = false;
+
   //----- Int -----
   int index = 1;
 
   //----- Strings -----
   String mesaNombre = '';
+  String productoSelected = '';
 
   //----- Lists -----
   List<Widget> familias = [];
+  List<String> productosFamilia = [];
+
+
+  //----- Map ------
+  Map<String,String> productos = {
+    'Cocacola':'Refrescos',
+    'Nestea':'Refrescos',
+    'Pepsi':'Refrescos',
+    'Fanta Naranja':'Refrescos',
+    'Fanta Limón':'Refrescos',
+    'Ensalada Marroquí':'Ensalada',
+    'Ensalada Mediterranea':'Ensalada'
+  };
 
   /* Métodos */
   void getList() async {
     SalasProvider salasProvider =
         Provider.of<SalasProvider>(context, listen: false);
-
-    Random random = Random();
     familias = [
       CustomContainer(
         maxHeight: 250,
         maxWidth: 150,
         gradientColors: const [
-          Color.fromARGB(255, 153, 94, 255),
-          Color.fromARGB(255, 212, 103, 255)
+          Color.fromARGB(255, 255, 247, 94),
+          Color.fromARGB(255, 227, 255, 103)
+        ],
+        boxShadowColor: Colors.orangeAccent,
+        image: 'assets/lata-de-refresco.png',
+        textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+        textColor: Colors.white,
+        onTap: () {
+          Iterable<String> claves = productos.keys;
+          for(var x in claves){
+            if(productos[x] == 'Refrescos'){
+              productosFamilia.add(x);
+            }
+          }
+          openProductos = true;
+          setState(() {
+
+          });
+        },
+
+        child: Text(
+          'Refrescos',
+          style: GoogleFonts.titanOne(
+              color: Colors.white,
+              fontSize: 20,
+              shadows: const [
+                Shadow(color: Colors.orangeAccent, blurRadius: 20)
+              ]),
+        ),
+      ),
+      CustomContainer(
+        maxHeight: 250,
+        maxWidth: 150,
+        gradientColors: const [
+          Color.fromARGB(255, 255, 247, 94),
+          Color.fromARGB(255, 227, 255, 103)
         ],
         boxShadowColor: Colors.orangeAccent,
         image: 'assets/lata-de-refresco.png',
@@ -64,36 +122,15 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
         maxHeight: 250,
         maxWidth: 150,
         gradientColors: const [
-          Color.fromARGB(255, 238, 238, 238),
-          Color.fromARGB(255, 54, 54, 54)
-        ],
-        boxShadowColor: Colors.black45,
-        image: 'assets/lata-de-refresco.png',
-        textShadowColor: const Color.fromARGB(255, 255, 168, 191),
-        textColor: Colors.white,
-        child: Text(
-          'Ensaladas',
-          style: GoogleFonts.titanOne(
-              color: Colors.white,
-              fontSize: 20,
-              shadows: const [
-                Shadow(color: Colors.indigo, blurRadius: 20)
-              ]),
-        ),
-      ),
-      CustomContainer(
-        maxHeight: 250,
-        maxWidth: 150,
-        gradientColors: [
-          Color.fromARGB(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255)),
-          Color.fromARGB(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255))
+          Color.fromARGB(255, 255, 247, 94),
+          Color.fromARGB(255, 227, 255, 103)
         ],
         boxShadowColor: Colors.orangeAccent,
         image: 'assets/lata-de-refresco.png',
-        textShadowColor: const Color.fromARGB(255, 255, 243, 168),
+        textShadowColor: const Color.fromARGB(255, 168, 252, 255),
         textColor: Colors.white,
         child: Text(
-          'Ensaladas',
+          'Refrescos',
           style: GoogleFonts.titanOne(
               color: Colors.white,
               fontSize: 20,
@@ -119,6 +156,57 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+
+    Timer.periodic(const Duration(milliseconds: 1), (timer) {
+      if(openProductos){
+        DropDownState(DropDown(
+          data: [
+            for(var x in productosFamilia)
+              SelectedListItem(name: x, value: x),
+          ],
+          selectedItems: (selectedItems) {
+            for(var x in selectedItems){
+              productoSelected = x.value!;
+              openCounter = true;
+            }
+          },
+        )).showModal(context);
+        openProductos = false;
+      }
+
+      if(openCounter){
+        Dialogs.materialDialog(
+            msg: 'Seleccione la cantidad',
+            title: productoSelected,
+            color: Colors.white,
+            context: context,
+            customViewPosition: CustomViewPosition.BEFORE_ACTION,
+            customView: Container(
+              padding: const EdgeInsets.only(top: 15),
+              child: CounterSlider(
+                value: 5,
+                width: 200,
+                height: 50,
+                slideFactor: 1.4,
+                onChanged: (int i) {  },
+              ),
+            ),
+            actions: [
+              IconsButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                text: 'Cerrar',
+                iconData: Icons.close,
+                color: Colors.red,
+                textStyle: TextStyle(color: Colors.white),
+                iconColor: Colors.white,
+              ),
+            ]);
+        openCounter = false;
+      }
+    });
+
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Hero(

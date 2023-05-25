@@ -49,6 +49,8 @@ dependencies:
   http: ^0.13.5
   shared_preferences: ^2.1.0
   loading_animation_widget: ^1.2.0+4
+  counter_slider: ^0.1.0
+  material_dialogs: ^1.1.4
 
 dev_dependencies:
   flutter_test:

@@ -52,16 +52,15 @@ class _MainScreenState extends State<MainScreen> {
               child: Stack(
                   children: [
                     const background(),
-                    Column(
-                      children: [
-                        Container(
-                            margin: const EdgeInsets.symmetric(vertical: 50),
-                            constraints: const BoxConstraints(maxHeight: 200),
-                            child: const FadeInImage(
-                                placeholder: AssetImage('assets/perfilusuario.png'),
-                                image: AssetImage('assets/perfilusuario.png'))),
-                        const CuadradoDelMedio(),
-                      ],
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 50, horizontal: MediaQuery.of(context).size.width * 0.3),
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        child: const FadeInImage(
+                            placeholder: AssetImage('assets/perfilusuario.png'),
+                            image: AssetImage('assets/perfilusuario.png'))),
+                    SingleChildScrollView(child: Container(
+                      margin: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.5),
+                        child: const CuadradoDelMedio())
                     ),
                   ]
               ),
@@ -82,7 +81,7 @@ class CuadradoDelMedio extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        constraints: const BoxConstraints(maxHeight: 400, maxWidth: 400),
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5, maxWidth: MediaQuery.of(context).size.width * 0.8),
         decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
