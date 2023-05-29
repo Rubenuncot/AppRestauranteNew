@@ -12,7 +12,7 @@ class Tipo {
   factory Tipo.fromRawJson(String str) => Tipo.fromJson(json.decode(str));
 
   factory Tipo.fromJson(Map<String, dynamic> json) =>
-      Tipo(id: int.parse(json['id']), nombre: json['nombre']);
+      Tipo(id:json['id'], nombre: json['nombre']);
 
   Map<String, dynamic> toJson() => {'id': '$id', 'nombre': nombre};
 }

@@ -12,7 +12,7 @@ class Sala {
   factory Sala.fromRawJson(String str) => Sala.fromJson(json.decode(str));
 
   factory Sala.fromJson(Map<String, dynamic> json) =>
-      Sala(id: int.parse(json['id']), nombre: json['nombre']);
+      Sala(id: json['id'], nombre: json['nombre']);
 
   Map<String, dynamic> toJson() => {'id': '$id', 'nombre': nombre};
 }

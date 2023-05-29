@@ -5,6 +5,8 @@ import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/database/models/models.dart';
+import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/mesa_screen.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
@@ -23,7 +25,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
 
   //----- Lists -----
   List<Widget> cards = [];
-  List<String> salas = ['Terraza', 'Salón', 'Barra'];
+  List salas = [];
   List<Color> colors = [];
 
   //----- Int -----
@@ -39,14 +41,18 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
   String iconStr = '';
 
   /* Métodos */
-  void getLists() {
+  void getLists() async {
     SalasProvider salasProvider =
         Provider.of<SalasProvider>(context, listen: false);
+    ApiProvider apiProvider = Provider.of<ApiProvider>(context);
 
+    salas = await apiProvider.getSalas(Sala(id: 1, nombre: 'nombre'));
+    List mesas = await apiProvider.getMesas(
+        Mesa(id: 1, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 1));
     for (var x in salas) {
-      if (x == salasProvider.salaSeleccionada) {
+      if (x.nombre == salasProvider.salaSeleccionada) {
         setState(() {
-          salaActual = x.substring(0, 1);
+          salaActual = x.nombre.substring(0, 1);
           switch (salaActual) {
             case 'T':
               iconStr = 'assets/terraza.png';
@@ -80,46 +86,49 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
       }
     }
 
-    for (var x = 0; x < 10; x++) {
-      Hero hero = Hero(
-        tag: salasProvider.heroMesa == '' ||
-                salasProvider.heroMesa.contains(salaActual)
-            ? x == 0
-                ? ''
-                : '$salaActual${x + 1}'
-            : '$salaActual${x + 1}',
-        child: CustomFuncyCard(
-          maxHeight: 250,
-          maxWidth: 150,
-          onTap: () {
-            setState(() {
-              mesaActual = '$salaActual${x + 1}';
-              salasProvider.heroMesa = mesaActual;
-              navigateMesa = true;
-              salasProvider.setNames('$salaActual${x + 1}');
-              salasProvider.setColors(colors);
-              salasProvider.setIcons(iconStr);
-            });
-          },
-          gradientColors: colors,
-          boxShadowColor: Colors.orangeAccent,
-          image: iconStr,
-          roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
-          textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-          textColor: Colors.white,
-          child: Text(
-            '$salaActual${x + 1}',
-            style: GoogleFonts.titanOne(
-                color: Colors.white,
-                fontSize: 20,
-                shadows: const [
-                  Shadow(color: Colors.orangeAccent, blurRadius: 20)
-                ]),
-          ),
-        ),
-      );
-
-      cards.add(hero);
+    if (cards.isEmpty) {
+      for (var x = 0; x < mesas.length; x++) {
+        if (mesas[x].nombre.contains(salaActual)) {
+          Hero hero = Hero(
+            tag: salasProvider.heroMesa == '' ||
+                    salasProvider.heroMesa.contains(salaActual)
+                ? x == 0
+                    ? ''
+                    : mesas[x].nombre
+                : mesas[x].nombre,
+            child: CustomFuncyCard(
+              maxHeight: 250,
+              maxWidth: 150,
+              onTap: () {
+                setState(() {
+                  mesaActual = mesas[x].nombre;
+                  salasProvider.heroMesa = mesaActual;
+                  navigateMesa = true;
+                  salasProvider.setNames(mesas[x].nombre);
+                  salasProvider.setColors(colors);
+                  salasProvider.setIcons(iconStr);
+                });
+              },
+              gradientColors: colors,
+              boxShadowColor: Colors.orangeAccent,
+              image: iconStr,
+              roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+              textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+              textColor: Colors.white,
+              child: Text(
+                mesas[x].nombre,
+                style: GoogleFonts.titanOne(
+                    color: Colors.white,
+                    fontSize: 20,
+                    shadows: const [
+                      Shadow(color: Colors.orangeAccent, blurRadius: 20)
+                    ]),
+              ),
+            ),
+          );
+          cards.add(hero);
+        }
+      }
     }
   }
 
@@ -165,10 +174,8 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
                       ],
                       boxShadowColor: Colors.transparent,
                       image: 'assets/comida-sana.png',
-                      roundedBoxColor:
-                          const Color.fromARGB(166, 184, 255, 255),
-                      textShadowColor:
-                          const Color.fromARGB(255, 168, 252, 255),
+                      roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
+                      textShadowColor: const Color.fromARGB(255, 168, 252, 255),
                       textColor: Colors.white,
                       title: Text(
                         'Fuera de carta',
@@ -176,8 +183,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
                             color: Colors.white,
                             fontSize: 15,
                             shadows: const [
-                              Shadow(
-                                  color: Colors.orangeAccent, blurRadius: 20)
+                              Shadow(color: Colors.orangeAccent, blurRadius: 20)
                             ]),
                       ),
                       child: Column(
@@ -217,8 +223,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
       ),
       appBar: AppBar(
         title: Text(
-            Provider.of<SalasProvider>(context, listen: false)
-                .salaSeleccionada,
+            Provider.of<SalasProvider>(context, listen: false).salaSeleccionada,
             style: GoogleFonts.titanOne(
               color: Colors.black87,
               fontSize: 12,
@@ -234,14 +239,12 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
               mainAxisSpacing: 8,
               children: List.generate(
                 cards.length,
-                    (index) => Center(
-                    child: cards[index]
-                ),
+                (index) => Center(child: cards[index]),
               ),
             ),
           ),
         ],
       ),
-      );
+    );
   }
 }

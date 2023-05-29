@@ -13,6 +13,8 @@ import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/database/models/familia.dart';
+import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
 import 'package:prueba_widgets/screens/main_screen.dart';
@@ -48,97 +50,52 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
 
 
   //----- Map ------
-  Map<String,String> productos = {
-    'Cocacola':'Refrescos',
-    'Nestea':'Refrescos',
-    'Pepsi':'Refrescos',
-    'Fanta Naranja':'Refrescos',
-    'Fanta Limón':'Refrescos',
-    'Ensalada Marroquí':'Ensalada',
-    'Ensalada Mediterranea':'Ensalada'
-  };
+  Map<String,String> productos = {};
 
   /* Métodos */
   void getList() async {
     SalasProvider salasProvider =
         Provider.of<SalasProvider>(context, listen: false);
+    ApiProvider apiProvider = Provider.of<ApiProvider>(context);
+
+    List familiasTemp = await apiProvider.getFamilias(Familia(id: 1, nombre: 'nombre'));
+
     familias = [
-      CustomContainer(
-        maxHeight: 250,
-        maxWidth: 150,
-        gradientColors: const [
-          Color.fromARGB(255, 255, 247, 94),
-          Color.fromARGB(255, 227, 255, 103)
-        ],
-        boxShadowColor: Colors.orangeAccent,
-        image: 'assets/lata-de-refresco.png',
-        textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-        textColor: Colors.white,
-        onTap: () {
-          Iterable<String> claves = productos.keys;
-          for(var x in claves){
-            if(productos[x] == 'Refrescos'){
-              productosFamilia.add(x);
+      for(var familia in familiasTemp)
+        CustomContainer(
+          maxHeight: 250,
+          maxWidth: 150,
+          gradientColors: const [
+            Color.fromARGB(255, 255, 247, 94),
+            Color.fromARGB(255, 227, 255, 103)
+          ],
+          boxShadowColor: Colors.orangeAccent,
+          image: 'assets/lata-de-refresco.png',
+          textShadowColor: const Color.fromARGB(255, 168, 252, 255),
+          textColor: Colors.white,
+          onTap: () {
+            Iterable<String> claves = productos.keys;
+            for(var x in claves){
+              if(productos[x] == familia.nombre){
+                productosFamilia.add(x);
+              }
             }
-          }
-          openProductos = true;
-          setState(() {
+            openProductos = true;
+            setState(() {
 
-          });
-        },
+            });
+          },
 
-        child: Text(
-          'Refrescos',
-          style: GoogleFonts.titanOne(
-              color: Colors.white,
-              fontSize: 20,
-              shadows: const [
-                Shadow(color: Colors.orangeAccent, blurRadius: 20)
-              ]),
+          child: Text(
+            'Refrescos',
+            style: GoogleFonts.titanOne(
+                color: Colors.white,
+                fontSize: 20,
+                shadows: const [
+                  Shadow(color: Colors.orangeAccent, blurRadius: 20)
+                ]),
+          ),
         ),
-      ),
-      CustomContainer(
-        maxHeight: 250,
-        maxWidth: 150,
-        gradientColors: const [
-          Color.fromARGB(255, 255, 247, 94),
-          Color.fromARGB(255, 227, 255, 103)
-        ],
-        boxShadowColor: Colors.orangeAccent,
-        image: 'assets/lata-de-refresco.png',
-        textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-        textColor: Colors.white,
-        child: Text(
-          'Refrescos',
-          style: GoogleFonts.titanOne(
-              color: Colors.white,
-              fontSize: 20,
-              shadows: const [
-                Shadow(color: Colors.orangeAccent, blurRadius: 20)
-              ]),
-        ),
-      ),
-      CustomContainer(
-        maxHeight: 250,
-        maxWidth: 150,
-        gradientColors: const [
-          Color.fromARGB(255, 255, 247, 94),
-          Color.fromARGB(255, 227, 255, 103)
-        ],
-        boxShadowColor: Colors.orangeAccent,
-        image: 'assets/lata-de-refresco.png',
-        textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-        textColor: Colors.white,
-        child: Text(
-          'Refrescos',
-          style: GoogleFonts.titanOne(
-              color: Colors.white,
-              fontSize: 20,
-              shadows: const [
-                Shadow(color: Colors.orangeAccent, blurRadius: 20)
-              ]),
-        ),
-      ),
     ];
     setState(() {
       mesaNombre = salasProvider.heroMesa;

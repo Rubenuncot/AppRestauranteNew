@@ -4,33 +4,41 @@ import 'dart:typed_data';
 class Usuario {
   Usuario({
     required this.id,
-    required this.nombre,
-    required this.rol,
-    required this.qr,
-    required this.code,
+    required this.name,
+    required this.apellido,
+    required this.dni,
+    required this.email,
+    required this.imagenQr,
+    required this.codigoQr,
   });
 
   int id;
-  String nombre;
-  String rol;
-  Uint8List qr;
-  String code;
+  String name;
+  String email;
+  String apellido;
+  String dni;
+  Uint8List imagenQr;
+  String codigoQr;
 
   factory Usuario.fromRawJson(String str) =>
       Usuario.fromJson(json.decode(str));
 
   factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
-      id: int.parse(json['id']),
-      nombre: json['nombre'],
-      rol: json['rol'],
-      qr: json['qr'], /* Para enseñar la imagen se puede usar Image.memory(snapshot.data[index].pict) */
-      code: json['code']);
+      id:json['id'],
+      name: json['name'].runtimeType.toString() == 'Null' ? '' : json['Name'],
+      apellido: json['apellidos'],
+      dni: json['dni'],
+      email: json['email'],
+      imagenQr: Uint8List.fromList(utf8.encode(json['imagenQr'])), /* Para enseñar la imagen se puede usar Image.memory(snapshot.data[index].pict) */
+      codigoQr: json['codigoQr']);
 
   Map<String, dynamic> toJson() => {
     'id': '$id',
-    'nombre': nombre,
-    'rol': rol,
-    'qr': qr,
-    'code': code
+    'name': name,
+    'imagenQr': imagenQr,
+    'codigoQr': codigoQr,
+    'email':email,
+    'apellidos':apellido,
+    'dni':dni
   };
 }

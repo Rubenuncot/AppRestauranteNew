@@ -9,6 +9,7 @@ class Reserva {
     required this.comensales,
     required this.hora,
     required this.fecha,
+    required this.idMesa,
     required this.anotaciones,
   });
 
@@ -17,6 +18,7 @@ class Reserva {
   String apellidos;
   String telefono;
   int comensales;
+  int idMesa;
   DateTime hora;
   DateTime fecha;
   String anotaciones;
@@ -25,11 +27,12 @@ class Reserva {
       Reserva.fromJson(json.decode(str));
 
   factory Reserva.fromJson(Map<String, dynamic> json) => Reserva(
-      id: int.parse(json['id']),
+      id: json['id'],
       nombre: json['nombre'],
       apellidos: json['apellidos'],
       telefono: json['telefono'],
       comensales: json['comensales'],
+      idMesa: json['idMesa'],
       hora: DateTime.parse(json['hora']),
       fecha: DateTime.parse(json['fecha']),
       anotaciones: json['anotaciones']
@@ -41,6 +44,7 @@ class Reserva {
     'apellidos' : apellidos,
     'telefono' : telefono,
     'comensales' : '$comensales',
+    'idMesa' : '$idMesa',
     'hora' : hora.toString(),
     'fecha' : fecha.toString(),
     'anotaciones' : anotaciones

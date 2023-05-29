@@ -24,7 +24,7 @@ class Producto {
           idFamilia : json['idFamilia'],
           nombre: json['nombre'],
           descripcion: json['descripcion'],
-          precio: json['precio']);
+          precio: json['precio'].runtimeType.toString() == 'String' ? double.parse(json['precio']) : json['precio']);
 
   Map<String, dynamic> toJson() => id != null
       ? {

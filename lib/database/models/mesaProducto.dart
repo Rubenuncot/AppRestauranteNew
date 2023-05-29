@@ -15,9 +15,9 @@ class MesaProducto {
       MesaProducto.fromJson(json.decode(str));
 
   factory MesaProducto.fromJson(Map<String, dynamic> json) => MesaProducto(
-      id: int.parse(json['id']),
-      producto: int.parse(json['producto']),
-      mesa: int.parse(json['mesa']),
+      id: json['id'],
+      producto:json['producto'],
+      mesa: json['mesa'],
   );
 
   Map<String, dynamic> toJson() => {

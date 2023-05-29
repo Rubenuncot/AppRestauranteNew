@@ -21,11 +21,11 @@ class LineasComanda {
       LineasComanda.fromJson(json.decode(str));
 
   factory LineasComanda.fromJson(Map<String, dynamic> json) => LineasComanda(
-      id: int.parse(json['id']),
-      precio: double.parse(json['precio']),
-      producto: int.parse(json['producto']),
-      cantidad: int.parse(json['cantidad']),
-      enviado: int.parse(json['enviado']),
+      id: json['id'],
+      precio: json['precio'],
+      producto:json['producto'],
+      cantidad:json['cantidad'],
+      enviado:json['enviado'],
       detalle: json['detalle']);
 
   Map<String, dynamic> toJson() => {

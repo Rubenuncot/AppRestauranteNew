@@ -12,7 +12,7 @@ class Familia {
   factory Familia.fromRawJson(String str) => Familia.fromJson(json.decode(str));
 
   factory Familia.fromJson(Map<String, dynamic> json) =>
-      Familia(id: int.parse(json['id']), nombre: json['nombre']);
+      Familia(id: json['id'], nombre: json['nombre']);
 
   Map<String, dynamic> toJson() => {'id': '$id', 'nombre': nombre};
 }

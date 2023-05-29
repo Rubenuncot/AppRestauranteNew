@@ -24,7 +24,7 @@ class RestauranteInfo {
       RestauranteInfo.fromJson(json.decode(str));
 
   factory RestauranteInfo.fromJson(Map<String, dynamic> json) => RestauranteInfo(
-      id: int.parse(json['id']),
+      id: json['id'],
       nombre: json['nombre'],
     direccion: json['direccion'],
     telefono: json['telefono'],

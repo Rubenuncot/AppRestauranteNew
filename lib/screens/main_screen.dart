@@ -6,6 +6,8 @@ import 'package:prueba_widgets/providers/log_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
 import 'package:prueba_widgets/shared_preferences/preferences.dart';
 
+import '../providers/api_provider.dart';
+
 class MainScreen extends StatefulWidget {
   static String routeName = '_main';
 
@@ -122,17 +124,6 @@ class CuadradoDelMedio extends StatelessWidget {
               child: MaterialButton(
                 onPressed: () {
                   // Todo: Poner lo de la lectura del código qr
-
-                  // Provider.of<ApiProvider>(context, listen: false).responseJsonData('show',
-                  //     {'': ''});
-                  //
-                  // Provider.of<ApiProvider>(context, listen: false).responseJsonData('update',
-                  //     {
-                  //       'type' : '2',
-                  //       'id' : '1',
-                  //       'param' : 'cantidad',
-                  //       'value' : '2',
-                  //     });
 
                   Provider.of<LogProvider>(context, listen: false).waiting = true;
                 },
