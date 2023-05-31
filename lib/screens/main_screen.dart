@@ -19,7 +19,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   Future<void> logIn() async{
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 20));
     Preferences.saveLoginStateToPreferences(false);
     Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }

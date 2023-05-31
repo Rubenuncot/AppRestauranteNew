@@ -131,7 +131,7 @@ class DBProvider {
         telefono TEXT,
         comensales INTEGER,
         hora TEXT,
-        fecha TEXT,
+        fecha Date,
         anotaciones TEXT,
         mesa INTEGER,
         FOREIGN KEY (mesa) REFERENCES Mesa (id)

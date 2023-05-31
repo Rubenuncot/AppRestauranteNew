@@ -75,10 +75,14 @@ class _MyAppState extends State<MyApp> {
             await DBProvider.db.updateReg(version, 'version', version.version);
           }
         }
-
-        // Petición de todos los datos estáticos.
-        final responseTotal = await apiProvider
-            .responseJsonData('show', {'type': version.changes});
+        dynamic responseTotal = [];
+        if(versions.isEmpty){
+          // Petición de todos los datos estáticos.
+          responseTotal = await apiProvider
+              .responseJsonData('show', {'type': '20'});
+        } else {
+          responseTotal = await apiProvider.responseJsonData('show', {'type': version.changes});
+        }
 
         Map<String, dynamic> jsonMap = jsonDecode(responseTotal);
         Iterable<String> keys = jsonMap.keys;
@@ -90,15 +94,19 @@ class _MyAppState extends State<MyApp> {
               case 'salas':
                 Sala sala = Sala.fromJson(i);
                 List salas = await apiProvider.getSalas(sala);
-                for (var x in salas) {
-                  if (x.id == sala.id) {
-                    await DBProvider.db.updateReg(sala, 'nombre', sala.nombre);
-                  } else {
-                    if (!salas.contains(sala)) {
-                      print('si');
-                      await DBProvider.db.newReg(sala);
+                if(salas.isNotEmpty){
+                  for (var x in salas) {
+                    if (x.id == sala.id) {
+                      await DBProvider.db.updateReg(sala, 'nombre', sala.nombre);
+                    } else {
+                      if (!salas.contains(sala)) {
+                        print('si');
+
+                      }
                     }
                   }
+                } else {
+                  await DBProvider.db.newReg(sala);
                 }
                 break;
               case 'mesas':

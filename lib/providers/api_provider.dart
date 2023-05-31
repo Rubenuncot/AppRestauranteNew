@@ -101,10 +101,6 @@ class ApiProvider extends ChangeNotifier {
     final dynamic url;
     final dynamic response;
 
-    for(var x = 0; x < params.length; x++){
-      // print(params.keys.first);
-    }
-
     url = Uri.http(baseUrl, '/api/getResources/$verb', params);
 
     switch (verb) {
@@ -125,5 +121,10 @@ class ApiProvider extends ChangeNotifier {
     }
     // print(response.body);
     return response.body;
+  }
+
+  void getVersion() async {
+    await responseJsonData('show',
+        {'type': '20'});
   }
 }

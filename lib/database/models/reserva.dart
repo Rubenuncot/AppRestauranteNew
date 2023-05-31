@@ -19,7 +19,7 @@ class Reserva {
   String telefono;
   int comensales;
   int idMesa;
-  DateTime hora;
+  String hora;
   DateTime fecha;
   String anotaciones;
 
@@ -33,7 +33,7 @@ class Reserva {
       telefono: json['telefono'],
       comensales: json['comensales'],
       idMesa: json['idMesa'],
-      hora: DateTime.parse(json['hora']),
+      hora: json['hora'],
       fecha: DateTime.parse(json['fecha']),
       anotaciones: json['anotaciones']
   );
