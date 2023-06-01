@@ -51,6 +51,7 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   counter_slider: ^0.1.0
   material_dialogs: ^1.1.4
+  custom_navigation_bar: ^0.8.2
 
 dev_dependencies:
   flutter_test:

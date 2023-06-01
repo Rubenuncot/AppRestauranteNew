@@ -50,7 +50,6 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
         Mesa(id: 1, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 1));
     for (var x in salas) {
       if (x.nombre == salasProvider.salaSeleccionada) {
-        setState(() {
           salaActual = x.nombre.substring(0, 1);
           switch (salaActual) {
             case 'T':
@@ -81,7 +80,6 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
                 Color.fromARGB(255, 222, 104, 255)
               ];
           }
-        });
       }
     }
 
@@ -102,6 +100,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
                 setState(() {
                   mesaActual = mesas[x].nombre;
                   salasProvider.heroMesa = mesaActual;
+                  salasProvider.idMesa = mesas[x].id;
                   navigateMesa = true;
                   salasProvider.setNames(mesas[x].nombre);
                   salasProvider.setColors(colors);

@@ -5,6 +5,7 @@ class SalasProvider extends ChangeNotifier {
   String _mesaActual = 'S-254';
   String _salaSeleccionada = '';
   String _heroMesa = '';
+  int _idMesa = 0;
   List<String> iconoStr = [];
   List<List<Color>> colors = [];
   List<String> nombresMesas = [];
@@ -31,6 +32,13 @@ class SalasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  int get idMesa => _idMesa;
+
+  set idMesa(int value) {
+    _idMesa = value;
+    notifyListeners();
+  }
 
   void setColors(List<Color> colors){
     if(!_notAdd){

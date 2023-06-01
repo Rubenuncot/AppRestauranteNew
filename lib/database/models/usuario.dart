@@ -25,11 +25,11 @@ class Usuario {
 
   factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
       id:json['id'],
-      name: json['name'].runtimeType.toString() == 'Null' ? '' : json['Name'],
+      name: json['name'],
       apellido: json['apellidos'],
       dni: json['dni'],
       email: json['email'],
-      imagenQr: Uint8List.fromList(utf8.encode(json['imagenQr'])), /* Para enseñar la imagen se puede usar Image.memory(snapshot.data[index].pict) */
+      imagenQr: Uint8List.fromList(utf8.encode(json['imagenQr'].toString())), /* Para enseñar la imagen se puede usar Image.memory(snapshot.data[index].pict) */
       codigoQr: json['codigoQr']);
 
   Map<String, dynamic> toJson() => {

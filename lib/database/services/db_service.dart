@@ -53,9 +53,8 @@ class DBProvider {
         descripcion TEXT,
         idFamilia INTEGER,
         precio REAL,
-        tipo INTEGER,
-        FOREIGN KEY (idFamilia) REFERENCES Familia (id),
-        FOREIGN KEY (tipo) REFERENCES Tipo (id)
+        idTipo INTEGER,
+        FOREIGN KEY (idTipo) REFERENCES Familia (id)
       )
     ''');
 
@@ -63,12 +62,14 @@ class DBProvider {
       await db.execute('''
       CREATE TABLE LineasComanda (
         id INTEGER PRIMARY KEY,
+        idMesa INTEGER,
         precio REAL,
         producto INTEGER,
         cantidad INTEGER,
         enviado INTEGER,
         detalle TEXT,
-        FOREIGN KEY (producto) REFERENCES Producto (id)
+        FOREIGN KEY (producto) REFERENCES Producto (id),
+        FOREIGN KEY (idMesa) REFERENCES Mesa (id)
       )
     ''');
 
@@ -76,9 +77,7 @@ class DBProvider {
       await db.execute('''
       CREATE TABLE Comanda (
         id INTEGER PRIMARY KEY,
-        lineasComanda INTEGER,
-        precioTotal REAL,
-        FOREIGN KEY (lineasComanda) REFERENCES LineasComanda (id)
+        precioTotal REAL
       )
     ''');
 
@@ -133,8 +132,8 @@ class DBProvider {
         hora TEXT,
         fecha Date,
         anotaciones TEXT,
-        mesa INTEGER,
-        FOREIGN KEY (mesa) REFERENCES Mesa (id)
+        idMesa INTEGER,
+        FOREIGN KEY (idMesa) REFERENCES Mesa (id)
       )
     ''');
 
@@ -254,7 +253,7 @@ Future<int> deleteReg(dynamic obj) async {
 Future<int> updateReg(dynamic obj, String campo, dynamic cambio) async {
   final db = await database;
   final res = db!.rawUpdate('''
-  UPDATE ${obj.runtimeType} SET $campo = $cambio WHERE id = ${obj.id}
+  UPDATE ${obj.runtimeType} SET $campo = '$cambio' WHERE id = '${obj.id}'
 ''');
   return res;
 }

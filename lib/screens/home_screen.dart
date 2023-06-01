@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/database/models/mesa.dart';
+import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
 
@@ -267,9 +269,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /* Overrides */
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async{
     super.didChangeDependencies();
     SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
+    ApiProvider apiProvider = Provider.of<ApiProvider>(context, listen: false);
+
+    List mesas = await apiProvider.getMesas(Mesa(id: 0, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 0));
+    Mesa mesa = Mesa(id: 0, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 0);
     ultimaSala = salasProvider.heroMesa;
     _scrollController = ScrollController();
     listCarrousel = [
@@ -287,7 +293,13 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               setState(() {
                 mesaActual = salasProvider.nombresMesas[x];
+                for(var x in mesas){
+                  if(x.nombre == mesaActual){
+                    mesa = x;
+                  }
+                }
                 salasProvider.heroMesa = mesaActual;
+                salasProvider.idMesa = mesa.id;
                 navigateMesa = true;
               });
             },

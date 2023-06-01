@@ -7,11 +7,13 @@ class Producto {
     required this.descripcion,
     required this.precio,
     required this.idFamilia,
+    required this.idTipo,
   });
 
   int? id;
   int idFamilia;
   String nombre;
+  int idTipo;
   String descripcion;
   double precio;
 
@@ -22,6 +24,7 @@ class Producto {
       Producto(
           id : json['id'],
           idFamilia : json['idFamilia'],
+          idTipo : json['idTipo'],
           nombre: json['nombre'],
           descripcion: json['descripcion'],
           precio: json['precio'].runtimeType.toString() == 'String' ? double.parse(json['precio']) : json['precio']);
@@ -32,7 +35,8 @@ class Producto {
           'nombre': nombre,
           'descripcion': descripcion,
           'precio': '$precio',
-          'idFamilia': '$idFamilia'
+          'idFamilia': '$idFamilia',
+          'idTipo': '$idTipo'
         }
-      : {'nombre': nombre, 'descripcion': descripcion, 'precio': '$precio', 'idFamilia': '$idFamilia'};
+      : {'nombre': nombre, 'descripcion': descripcion, 'precio': '$precio', 'idFamilia': '$idFamilia', '$idTipo':'idtipo'};
 }

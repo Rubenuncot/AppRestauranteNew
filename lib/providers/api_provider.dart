@@ -21,6 +21,7 @@ class ApiProvider extends ChangeNotifier {
   List restaurantes = [];
   List familias = [];
   List comandas = [];
+  List lineasComandas = [];
 
   Future<List> getSalas(Sala sala) async{
     salas = await DBProvider.db.getAllReg(sala);
@@ -29,31 +30,44 @@ class ApiProvider extends ChangeNotifier {
   }
   Future<List> getMesas(Mesa mesa) async{
     mesas = await DBProvider.db.getAllReg(mesa);
+    notifyListeners();
     return mesas;
   }
   Future<List> getProductos(Producto producto) async{
     productos = await DBProvider.db.getAllReg(producto);
+    notifyListeners();
     return productos;
   }
   Future<List> getUsuarios(Usuario usuario) async{
     usuarios = await DBProvider.db.getAllReg(usuario);
+    notifyListeners();
     return usuarios;
   }
   Future<List> getReservas(Reserva reserva) async{
     reservas = await DBProvider.db.getAllReg(reserva);
+    notifyListeners();
     return reservas;
   }
   Future<List> getRestaurantes(RestauranteInfo restauranteInfo) async{
     restaurantes = await DBProvider.db.getAllReg(restauranteInfo);
+    notifyListeners();
     return restaurantes;
   }
   Future<List> getFamilias(Familia familia) async{
     familias = await DBProvider.db.getAllReg(familia);
+    notifyListeners();
+
     return familias;
   }
   Future<List> getComandas(Comanda comanda) async{
     comandas = await DBProvider.db.getAllReg(comanda);
+    notifyListeners();
     return comandas;
+  }
+  Future<List> getLineasComandas(LineasComanda lineasComanda) async{
+    lineasComandas = await DBProvider.db.getAllReg(lineasComanda);
+    notifyListeners();
+    return lineasComandas;
   }
 
   void setSalas(Sala value) {

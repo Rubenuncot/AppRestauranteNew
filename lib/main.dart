@@ -101,7 +101,8 @@ class _MyAppState extends State<MyApp> {
                     } else {
                       if (!salas.contains(sala)) {
                         print('si');
-
+                        await DBProvider.db.newReg(sala);
+                        break;
                       }
                     }
                   }
@@ -109,160 +110,201 @@ class _MyAppState extends State<MyApp> {
                   await DBProvider.db.newReg(sala);
                 }
                 break;
+              case 'tipoProductos':
+                Familia familia = Familia.fromJson(i);
+
+                List familias = await apiProvider.getFamilias(familia);
+
+                if(familias.isNotEmpty){
+                  for (var x in familias) {
+                    if (x.id == familia.id) {
+                      await DBProvider.db
+                          .updateReg(familia, 'nombre', familia.nombre);
+                    } else {
+                      if (!familias.contains(familia)) {
+                        print('si');
+                        await DBProvider.db.newReg(familia);
+                        break;
+                      }
+                    }
+                  }
+                } else {
+                  await DBProvider.db.newReg(familia);
+                }
+                break;
               case 'mesas':
                 Mesa mesa = Mesa.fromJson(i);
                 List mesas = await apiProvider.getMesas(mesa);
-                for (var x in mesas) {
-                  if (x.id == mesa.id) {
-                    await DBProvider.db
-                        .updateReg(mesa, 'capacidad', mesa.capacidad);
-                    await DBProvider.db.updateReg(mesa, 'nombre', mesa.nombre);
-                    await DBProvider.db
-                        .updateReg(mesa, 'comensales', mesa.comensales);
-                  } else {
-                    if (!mesas.contains(mesa)) {
-                      await DBProvider.db.newReg(mesa);
+                if(mesas.isNotEmpty){
+                  for (var x in mesas) {
+                    if (x.id == mesa.id) {
+                      await DBProvider.db
+                          .updateReg(mesa, 'capacidad', mesa.capacidad);
+                      await DBProvider.db.updateReg(mesa, 'nombre', mesa.nombre);
+                      await DBProvider.db
+                          .updateReg(mesa, 'comensales', mesa.comensales);
+                    } else {
+                      if (!mesas.contains(mesa)) {
+                        await DBProvider.db.newReg(mesa);
+                        break;
+                      }
                     }
                   }
+                } else {
+                  await DBProvider.db.newReg(mesa);
                 }
+
                 break;
               case 'comandas':
                 Comanda comanda = Comanda.fromJson(i);
 
                 List comandas = await apiProvider.getComandas(comanda);
-                for (var x in comandas) {
-                  if (x.id == comanda.id) {
-                    await DBProvider.db.updateReg(
-                        comandas, 'precioTotal', comanda.precioTotal);
-                  } else {
-                    if (!comandas.contains(comanda)) {
-                      print('si');
-                      await DBProvider.db.newReg(comanda);
+                if(comandas.isNotEmpty){
+                  for (var x in comandas) {
+                    if (x.id == comanda.id) {
+                      await DBProvider.db.updateReg(
+                          comandas, 'precioTotal', comanda.precioTotal);
+                    } else {
+                      if (!comandas.contains(comanda)) {
+                        print('si');
+                        await DBProvider.db.newReg(comanda);
+                        break;
+                      }
                     }
                   }
+                } else {
+                  await DBProvider.db.newReg(comanda);
                 }
+
                 break;
               case 'productos':
                 Producto producto = Producto.fromJson(i);
 
                 List productos = await apiProvider.getProductos(producto);
 
-                for (var x in productos) {
-                  if (x.id == producto.id) {
-                    await DBProvider.db
-                        .updateReg(producto, 'nombre', producto.nombre);
-                    await DBProvider.db
-                        .updateReg(producto, 'idFamilia', producto.idFamilia);
-                    await DBProvider.db.updateReg(
-                        producto, 'descripcion', producto.descripcion);
-                    await DBProvider.db
-                        .updateReg(producto, 'precio', producto.precio);
-                  } else {
-                    if (!productos.contains(producto)) {
-                      print('si');
-                      await DBProvider.db.newReg(producto);
+                if(productos.isNotEmpty){
+                  for (var x in productos) {
+                    if (x.id == producto.id) {
+                      await DBProvider.db
+                          .updateReg(producto, 'nombre', producto.nombre);
+                      await DBProvider.db
+                          .updateReg(producto, 'idFamilia', producto.idFamilia);
+                      await DBProvider.db.updateReg(
+                          producto, 'descripcion', producto.descripcion);
+                      await DBProvider.db
+                          .updateReg(producto, 'precio', producto.precio);
+                    } else {
+                      if (!productos.contains(producto)) {
+                        print('si');
+                        await DBProvider.db.newReg(producto);
+                        break;
+                      }
                     }
                   }
+                } else {
+                  await DBProvider.db.newReg(producto);
                 }
+
                 break;
               case 'usuarios':
                 Usuario usuario = Usuario.fromJson(i);
                 List usuarios = await apiProvider.getUsuarios(usuario);
-                for (var x in usuarios) {
-                  if (x.id == usuario.id) {
-                    await DBProvider.db
-                        .updateReg(usuario, 'name', usuario.name);
-                    await DBProvider.db
-                        .updateReg(usuario, 'email', usuario.email);
-                    await DBProvider.db
-                        .updateReg(usuario, 'apellido', usuario.apellido);
-                    await DBProvider.db.updateReg(usuario, 'dni', usuario.dni);
-                    await DBProvider.db
-                        .updateReg(usuario, 'codigoQr', usuario.codigoQr);
-                    await DBProvider.db
-                        .updateReg(usuario, 'imagenQr', usuario.imagenQr);
-                  } else {
-                    if (!usuarios.contains(usuario)) {
-                      print('si');
-                      await DBProvider.db.newReg(usuario);
+
+                if(usuarios.isNotEmpty){
+                  for (var x in usuarios) {
+                    if (x.id == usuario.id) {
+                      await DBProvider.db
+                          .updateReg(usuario, 'name', usuario.name);
+                      await DBProvider.db
+                          .updateReg(usuario, 'email', usuario.email);
+                      await DBProvider.db
+                          .updateReg(usuario, 'apellido', usuario.apellido);
+                      await DBProvider.db.updateReg(usuario, 'dni', usuario.dni);
+                      await DBProvider.db
+                          .updateReg(usuario, 'codigoQr', usuario.codigoQr);
+                      await DBProvider.db
+                          .updateReg(usuario, 'imagenQr', usuario.imagenQr);
+                    } else {
+                      if (!usuarios.contains(usuario)) {
+                        print('si');
+                        await DBProvider.db.newReg(usuario);
+                        break;
+                      }
                     }
                   }
+                } else {
+                  await DBProvider.db.newReg(usuario);
                 }
+
                 break;
               case 'reservas':
                 Reserva reserva = Reserva.fromJson(i);
 
                 List reservas = await apiProvider.getReservas(reserva);
 
-                for (var x in reservas) {
-                  if (x.id == reserva.id) {
-                    await DBProvider.db
-                        .updateReg(reserva, 'comensales', reserva.comensales);
-                    await DBProvider.db
-                        .updateReg(reserva, 'hora', reserva.hora);
-                    await DBProvider.db
-                        .updateReg(reserva, 'fecha', reserva.fecha);
-                    await DBProvider.db
-                        .updateReg(reserva, 'anotaciones', reserva.anotaciones);
-                    await DBProvider.db
-                        .updateReg(reserva, 'idMesa', reserva.idMesa);
-                    await DBProvider.db
-                        .updateReg(reserva, 'nombre', reserva.nombre);
-                    await DBProvider.db
-                        .updateReg(reserva, 'apellidos', reserva.apellidos);
-                    await DBProvider.db
-                        .updateReg(reserva, 'telefono', reserva.telefono);
-                  } else {
-                    if (!reservas.contains(reserva)) {
-                      await DBProvider.db.newReg(reserva);
+                if(reservas.isNotEmpty){
+                  for (var x in reservas) {
+                    if (x.id == reserva.id) {
+                      await DBProvider.db
+                          .updateReg(reserva, 'comensales', reserva.comensales);
+                      await DBProvider.db
+                          .updateReg(reserva, 'hora', reserva.hora);
+                      await DBProvider.db
+                          .updateReg(reserva, 'fecha', reserva.fecha);
+                      await DBProvider.db
+                          .updateReg(reserva, 'anotaciones', reserva.anotaciones);
+                      await DBProvider.db
+                          .updateReg(reserva, 'idMesa', reserva.idMesa);
+                      await DBProvider.db
+                          .updateReg(reserva, 'nombre', reserva.nombre);
+                      await DBProvider.db
+                          .updateReg(reserva, 'apellidos', reserva.apellidos);
+                      await DBProvider.db
+                          .updateReg(reserva, 'telefono', reserva.telefono);
+                    } else {
+                      if (!reservas.contains(reserva)) {
+                        await DBProvider.db.newReg(reserva);
+                        break;
+                      }
                     }
                   }
+                } else{
+                  await DBProvider.db.newReg(reserva);
                 }
+
                 break;
               case 'restaurante':
                 RestauranteInfo restaurante = RestauranteInfo.fromJson(i);
                 List restaurantes =
                     await apiProvider.getRestaurantes(restaurante);
 
-                for (var x in restaurantes) {
-                  if (x.id == restaurante.id) {
-                    await DBProvider.db
-                        .updateReg(restaurante, 'nombre', restaurante.nombre);
-                    await DBProvider.db.updateReg(restaurante,
-                        'domicilioFiscal', restaurante.domicilioFiscal);
-                    await DBProvider.db
-                        .updateReg(restaurante, 'cif', restaurante.cif);
-                    await DBProvider.db.updateReg(
-                        restaurante, 'telefono', restaurante.telefono);
-                    await DBProvider.db.updateReg(
-                        restaurante, 'direccion', restaurante.direccion);
-                    await DBProvider.db
-                        .updateReg(restaurante, 'logo', restaurante.logo);
-                  } else {
-                    if (!restaurantes.contains(restaurante)) {
-                      print('si');
-                      await DBProvider.db.newReg(restaurante);
+                if(restaurantes.isNotEmpty){
+                  for (var x in restaurantes) {
+                    if (x.id == restaurante.id) {
+                      await DBProvider.db
+                          .updateReg(restaurante, 'nombre', restaurante.nombre);
+                      await DBProvider.db.updateReg(restaurante,
+                          'domicilioFiscal', restaurante.domicilioFiscal);
+                      await DBProvider.db
+                          .updateReg(restaurante, 'cif', restaurante.cif);
+                      await DBProvider.db.updateReg(
+                          restaurante, 'telefono', restaurante.telefono);
+                      await DBProvider.db.updateReg(
+                          restaurante, 'direccion', restaurante.direccion);
+                      await DBProvider.db
+                          .updateReg(restaurante, 'logo', restaurante.logo);
+                    } else {
+                      if (!restaurantes.contains(restaurante)) {
+                        print('si');
+                        await DBProvider.db.newReg(restaurante);
+                        break;
+                      }
                     }
                   }
+                } else {
+                  await DBProvider.db.newReg(restaurante);
                 }
                 break;
-              case 'tipoProductos':
-                Familia familia = Familia.fromJson(i);
-
-                List familias = await apiProvider.getFamilias(familia);
-
-                for (var x in familias) {
-                  if (x.id == familia.id) {
-                    await DBProvider.db
-                        .updateReg(familia, 'nombre', familia.nombre);
-                  } else {
-                    if (!familias.contains(familia)) {
-                      print('si');
-                      await DBProvider.db.newReg(familia);
-                    }
-                  }
-                  break;
-                }
             }
           }
         }
