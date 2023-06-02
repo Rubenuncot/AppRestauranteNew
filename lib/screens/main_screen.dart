@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/globalDatabase/db_connection.dart';
 import 'package:prueba_widgets/providers/log_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
 import 'package:prueba_widgets/shared_preferences/preferences.dart';
@@ -19,7 +20,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   Future<void> logIn() async{
-    await Future.delayed(const Duration(seconds: 20));
+    await Future.delayed(const Duration(seconds: 3));
     Preferences.saveLoginStateToPreferences(false);
     Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }
@@ -124,7 +125,6 @@ class CuadradoDelMedio extends StatelessWidget {
               child: MaterialButton(
                 onPressed: () {
                   // Todo: Poner lo de la lectura del código qr
-
                   Provider.of<LogProvider>(context, listen: false).waiting = true;
                 },
                 padding: const EdgeInsets.all(20),

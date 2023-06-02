@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/database/models/models.dart';
+import 'package:prueba_widgets/globalDatabase/db_connection.dart';
 import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/mesa_screen.dart';
@@ -25,6 +26,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
   //----- Lists -----
   List<Widget> cards = [];
   List salas = [];
+  List mesas = [];
   List<Color> colors = [];
 
   //----- Int -----
@@ -43,11 +45,15 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
   void getLists() async {
     SalasProvider salasProvider =
         Provider.of<SalasProvider>(context, listen: false);
-    ApiProvider apiProvider = Provider.of<ApiProvider>(context);
 
-    salas = await apiProvider.getSalas(Sala(id: 1, nombre: 'nombre'));
-    List mesas = await apiProvider.getMesas(
-        Mesa(id: 1, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 1));
+    final salasRes = await DBConnection.rawQuery('Select * from res_salas');
+    final mesasRes = await DBConnection.rawQuery('Select * from res_mesas');
+    for(var x in salasRes){
+      salas.add(Sala(id: x[0], nombre: x[1]));
+    }
+    for(var x in mesasRes){
+      mesas.add(Mesa(id: x[0], nombre: x[2], sala: x[4], capacidad: x[1], comensales: x[3]));
+    }
     for (var x in salas) {
       if (x.nombre == salasProvider.salaSeleccionada) {
           salaActual = x.nombre.substring(0, 1);
@@ -128,6 +134,9 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
         }
       }
     }
+    setState(() {
+
+    });
   }
 
   @override

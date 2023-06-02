@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/database/models/mesa.dart';
+import 'package:prueba_widgets/globalDatabase/db_connection.dart';
 import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
@@ -33,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //-----Listas-----
   List<Widget> list = [];
   List<Widget> listCarrousel = [];
+  List salas = [];
 
   //-----Boleanos-----
   bool navigateSala = false;
@@ -229,9 +231,8 @@ class _HomeScreenState extends State<HomeScreen> {
   showDialogSalas(int i) {
     DropDownState(DropDown(
       data: [
-        SelectedListItem(name: 'Terraza', value: 'Terraza'),
-        SelectedListItem(name: 'Salón', value: 'Salón'),
-        SelectedListItem(name: 'Barra', value: 'Barra'),
+        for(var x in salas)
+          SelectedListItem(name: '$x', value: '$x'),
       ],
       selectedItems: (selectedItems) {
         switch (i) {
@@ -272,12 +273,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void didChangeDependencies() async{
     super.didChangeDependencies();
     SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
-    ApiProvider apiProvider = Provider.of<ApiProvider>(context, listen: false);
 
-    List mesas = await apiProvider.getMesas(Mesa(id: 0, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 0));
+    final salasResult = await DBConnection.rawQuery('Select nombre from res_salas');
+    for (var x in salasResult){
+      salas.add(x[0]);
+    }
+    final mesasResutl = await DBConnection.rawQuery('Select * from res_mesas');
+    List<Mesa> mesas = [];
+    for (var x in mesasResutl){
+      mesas.add(Mesa(id: x[0], nombre: x[2], sala: x[4], capacidad: x[1], comensales: x[3]));
+    }
+    print(mesas);
     Mesa mesa = Mesa(id: 0, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 0);
-    ultimaSala = salasProvider.heroMesa;
-    _scrollController = ScrollController();
+    // ApiProvider apiProvider = Provider.of<ApiProvider>(context, listen: false);
+    // List mesas = await apiProvider.getMesas(Mesa(id: 0, nombre: 'nombre', sala: 1, capacidad: 1, comensales: 0));
+    // ultimaSala = salasProvider.heroMesa;
+    // _scrollController = ScrollController();
     listCarrousel = [
       for (var x = 0; x < salasProvider.nombresMesas.length; x++)
         Hero(
@@ -321,6 +332,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
     ];
+    setState(() {
+
+    });
   }
 
   @override
@@ -404,7 +418,8 @@ class _HomeScreenState extends State<HomeScreen> {
         textColor: Colors.white,
         onTap: () {
           setState(() {
-            waiting = true;
+            // DBConnection.insert();
+            // waiting = true;
           });
         },
       ),

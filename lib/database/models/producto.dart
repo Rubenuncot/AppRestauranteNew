@@ -2,7 +2,7 @@ import 'dart:convert';
 
 class Producto {
   Producto({
-    this.id,
+    required this.id,
     required this.nombre,
     required this.descripcion,
     required this.precio,
@@ -10,7 +10,7 @@ class Producto {
     required this.idTipo,
   });
 
-  int? id;
+  int id;
   int idFamilia;
   String nombre;
   int idTipo;
@@ -29,14 +29,12 @@ class Producto {
           descripcion: json['descripcion'],
           precio: json['precio'].runtimeType.toString() == 'String' ? double.parse(json['precio']) : json['precio']);
 
-  Map<String, dynamic> toJson() => id != null
-      ? {
+  Map<String, dynamic> toJson() =>  {
           'id': '$id',
           'nombre': nombre,
           'descripcion': descripcion,
           'precio': '$precio',
           'idFamilia': '$idFamilia',
           'idTipo': '$idTipo'
-        }
-      : {'nombre': nombre, 'descripcion': descripcion, 'precio': '$precio', 'idFamilia': '$idFamilia', '$idTipo':'idtipo'};
+        };
 }

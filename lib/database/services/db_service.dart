@@ -64,11 +64,11 @@ class DBProvider {
         id INTEGER PRIMARY KEY,
         idMesa INTEGER,
         precio REAL,
-        producto INTEGER,
+        idProducto INTEGER,
         cantidad INTEGER,
         enviado INTEGER,
         detalle TEXT,
-        FOREIGN KEY (producto) REFERENCES Producto (id),
+        FOREIGN KEY (idProducto) REFERENCES Producto (id),
         FOREIGN KEY (idMesa) REFERENCES Mesa (id)
       )
     ''');

@@ -4,7 +4,7 @@ class LineasComanda {
   LineasComanda({
     required this.id,
     required this.precio,
-    required this.producto,
+    required this.idProducto,
     required this.idMesa,
     required this.cantidad,
     required this.enviado,
@@ -13,7 +13,7 @@ class LineasComanda {
 
   int id;
   int idMesa;
-  int producto;
+  int idProducto;
   int cantidad;
   double precio;
   int enviado;
@@ -26,7 +26,7 @@ class LineasComanda {
       id: json['id'],
       idMesa: json['idMesa'],
       precio: double.parse(json['precio'].toString()),
-      producto:json['idProducto'],
+      idProducto:json['idProducto'],
       cantidad:json['cantidad'],
       enviado:json['enviado'],
       detalle: json['detalle']);
@@ -35,9 +35,24 @@ class LineasComanda {
         'id': '$id',
         'idMesa': '$idMesa',
         'precio': '$precio',
-        'idProducto': '$producto',
+        'idProducto': '$idProducto',
         'cantidad': '$cantidad',
         'enviado': '$enviado',
         'detalle': detalle
       };
+  @override
+  bool operator ==(other) {
+    if (identical(this, other)) return true;
+
+    return other is LineasComanda &&
+        id == other.id &&
+        // Compara las demás propiedades relevantes
+        cantidad == other.cantidad &&
+        precio == other.precio &&
+        enviado == other.enviado &&
+        detalle == other.detalle;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

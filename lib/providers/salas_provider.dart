@@ -10,11 +10,20 @@ class SalasProvider extends ChangeNotifier {
   List<List<Color>> colors = [];
   List<String> nombresMesas = [];
   bool _notAdd = false;
+  int _cantidad = 0;
 
   String get mesaActual => _mesaActual;
 
   set mesaActual(String value) {
     _mesaActual = value;
+    notifyListeners();
+  }
+
+
+  int get cantidad => _cantidad;
+
+  set cantidad(int value) {
+    _cantidad = value;
     notifyListeners();
   }
 

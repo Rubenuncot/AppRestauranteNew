@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:counter_slider/counter_slider.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:drop_down_list/drop_down_list.dart';
@@ -18,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:prueba_widgets/database/models/familia.dart';
 import 'package:prueba_widgets/database/models/models.dart';
 import 'package:prueba_widgets/database/services/db_service.dart';
+import 'package:prueba_widgets/globalDatabase/db_connection.dart';
 import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
@@ -41,10 +43,12 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
   //----- Bool -----
   bool openProductos = false;
   bool openCounter = false;
+  bool estaSolicitado = false;
 
   //----- Int -----
   int index = 2;
   int mesaId = 0;
+  int cant = 0;
 
   //----- Strings -----
   String mesaNombre = '';
@@ -52,60 +56,73 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
 
   //----- Lists -----
   List<Widget> familias = [];
+  List<Familia> familiasTipo = [];
+  List<Producto> productos = [];
   List<Producto> productosFamilia = [];
+  List<Comanda> comandas = [];
+  List<Comanda> comandasMesa = [];
   List<LineasComanda> lineasComandas = [];
   List<LineasComanda> lineasComandasAll = [];
+
   //----- Map ------
-  Map<String, String> productos = {};
 
   /* Métodos */
-
-  setLineaComanda(lineaTemp) async{
+  setLineaComanda(lineaTemp) async {
     await DBProvider.db.newReg(lineaTemp);
   }
 
   void getList() async {
     SalasProvider salasProvider =
         Provider.of<SalasProvider>(context, listen: false);
-    ApiProvider apiProvider = Provider.of<ApiProvider>(context);
-
-    List familiasTemp =
-        await apiProvider.getFamilias(Familia(id: 1, nombre: 'nombre'));
-    List productosTemp = await apiProvider.getProductos(Producto(nombre: 'nombre', idTipo: 1, descripcion: 'descripcion', precio: 7, idFamilia: 1));
-    Map<String, dynamic> lineasTemp = jsonDecode(await apiProvider.responseJsonData('show', {'type':'7'}));
-
     mesaId = salasProvider.idMesa;
+    final productosRes =
+        await DBConnection.rawQuery('Select * from res_productos');
+    final familiasRes =
+        await DBConnection.rawQuery('Select * from res_tipo_productos');
+    final lineasComandasRes = await DBConnection.rawQuery(
+        'Select * from res_lineas_comandas where idMesa = $mesaId');
+    final comandasRes = await DBConnection.rawQuery(
+        'Select * from res_comandas where id = $mesaId');
+    final lineasComandasAllRes = await DBConnection.rawQuery(
+        'Select * from res_lineas_comandas');
 
-    for(var x  in lineasTemp.keys){
-      for(var x in lineasTemp[x]){
-        LineasComanda lineasComanda = LineasComanda.fromJson(x);
-        List lineasComandas = await apiProvider.getLineasComandas(lineasComanda);
-        if(lineasComandas.isNotEmpty){
-          for (var x in lineasComandas) {
-            if (x.id == lineasComanda.id) {
-              await DBProvider.db.updateReg(lineasComanda, 'precio', lineasComanda.precio);
-              await DBProvider.db.updateReg(lineasComanda, 'cantidad', lineasComanda.cantidad);
-              await DBProvider.db.updateReg(lineasComanda, 'enviado', lineasComanda.enviado);
-              await DBProvider.db.updateReg(lineasComanda, 'detalle', lineasComanda.detalle);
-            } else {
-              if (!lineasComandas.contains(lineasComanda)) {
-                await DBProvider.db.newReg(lineasComanda);
-                break;
-              }
-            }
-          }
-        } else {
-          await DBProvider.db.newReg(lineasComanda);
-        }
-        lineasComandasAll.add(x);
-        if('${x['idMesa']}' == salasProvider.idMesa.toString()){
-          LineasComanda linea = LineasComanda.fromJson(x);
-          lineasComandas.add(linea);
-        }
-      }
+    for (var x in lineasComandasAllRes) {
+      lineasComandasAll.add(LineasComanda(
+          id: x[0],
+          precio: x[4],
+          idProducto: x[3],
+          idMesa: x[1],
+          cantidad: x[5],
+          enviado: x[6]));
     }
+
+    for (var x in comandasRes) {
+      comandas.add(Comanda(id: x[0], precioTotal: x[1]));
+    }
+    for (var x in productosRes) {
+      productos.add(Producto(
+          id: x[0],
+          nombre: x[1],
+          descripcion: x[4],
+          precio: x[7],
+          idFamilia: x[2],
+          idTipo: x[5]));
+    }
+    for (var x in familiasRes) {
+      familiasTipo.add(Familia(id: x[0], nombre: x[1]));
+    }
+    for (var x in lineasComandasRes) {
+      lineasComandas.add(LineasComanda(
+          id: x[0],
+          precio: x[4],
+          idProducto: x[3],
+          idMesa: x[1],
+          cantidad: x[5],
+          enviado: x[6]));
+    }
+
     familias = [
-      for (var familia in familiasTemp)
+      for (var familia in familiasTipo)
         CustomContainer(
           maxHeight: 250,
           maxWidth: 150,
@@ -119,8 +136,8 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
           textColor: Colors.white,
           onTap: () {
             productosFamilia = [];
-            for (var x in productosTemp){
-              if(x.idTipo == familia.id){
+            for (var x in productos) {
+              if (x.idTipo == familia.id) {
                 productosFamilia.add(x);
               }
             }
@@ -143,6 +160,12 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
     });
   }
 
+  sum(i){
+    setState(() {
+      cant = i;
+    });
+  }
+  /* Overrides */
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -150,15 +173,14 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
     getList();
   }
 
-  /* Overrides */
-
   @override
   Widget build(BuildContext context) {
-    Timer.periodic(const Duration(milliseconds: 1), (timer) async{
+    Timer.periodic(const Duration(milliseconds: 1), (timer) async {
       if (openProductos) {
         DropDownState(DropDown(
           data: [
-            for (var x in productosFamilia) SelectedListItem(name: x.nombre, value: x.id.toString()),
+            for (var x in productosFamilia)
+              SelectedListItem(name: x.nombre, value: x.id.toString()),
           ],
           selectedItems: (selectedItems) {
             for (var x in selectedItems) {
@@ -171,52 +193,118 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
       }
 
       if (openCounter) {
-        Producto prodTemp = Producto(nombre: 'nombre', idTipo: 1, descripcion: 'descripcion', precio: 7, idFamilia: 1);
-        LineasComanda lineaTemp = LineasComanda(id: 0, precio: 0, producto: 0, cantidad: 0, enviado: 0, detalle: 'detalle', idMesa: 0);
+        Producto prodTemp = Producto(
+            nombre: 'nombre',
+            idTipo: 1,
+            descripcion: 'descripcion',
+            precio: 7,
+            idFamilia: 1,
+            id: 0);
+        LineasComanda lineaTemp = LineasComanda(
+            id: 0,
+            precio: 0,
+            idProducto: 0,
+            cantidad: 0,
+            enviado: 0,
+            detalle: 'detalle',
+            idMesa: 0);
 
-        for(var x in productosFamilia){
-          if(x.id.toString() == productoSelected){
+        for (var x in productosFamilia) {
+          if (x.id.toString() == productoSelected) {
             prodTemp = x;
           }
         }
-        for(var x in lineasComandas){
-          if(x.producto == prodTemp.id){
+        for (var x in lineasComandas) {
+          if (x.idProducto == prodTemp.id) {
             lineaTemp = x;
           } else {
-            lineaTemp = LineasComanda(id: lineasComandasAll.last.id + 1, precio: prodTemp.precio, producto: prodTemp.id ?? productosFamilia.last.id! + 1, cantidad: 0, enviado: 0, detalle: '', idMesa: mesaId);
+            lineaTemp = LineasComanda(
+                id: lineasComandasAll.last.id + 1,
+                precio: prodTemp.precio,
+                idProducto: prodTemp.id,
+                cantidad: 0,
+                enviado: 0,
+                detalle: '',
+                idMesa: mesaId);
           }
         }
-        Dialogs.materialDialog(
-            msg: 'Seleccione la cantidad',
-            title: prodTemp.nombre,
-            color: Colors.white,
-            context: context,
-            customViewPosition: CustomViewPosition.BEFORE_ACTION,
-            customView: Container(
-              padding: const EdgeInsets.only(top: 15),
-              child: CounterSlider(
-                value: lineaTemp.cantidad,
-                width: 200,
-                height: 50,
-                slideFactor: 1.4,
-                onChanged: (int i) {
-                  lineaTemp.cantidad = i;
-                },
-              ),
-            ),
-            actions: [
-              IconsButton(
-                onPressed: () {
-                  setLineaComanda(lineaTemp);
-                  Navigator.pop(context);
-                },
-                text: 'Cerrar',
-                iconData: Icons.close,
-                color: Colors.red,
-                textStyle: const TextStyle(color: Colors.white),
-                iconColor: Colors.white,
-              ),
-            ]);
+        showDialog(context: context,
+            builder: (context) => StatefulBuilder(builder: (context, setState) {
+              return Dialog(
+                child: Container(
+                  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height *0.3, maxWidth: MediaQuery.of(context).size.width *0.8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(150),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Expanded(child: Center(child: Text('Ensalada César', style: TextStyle(fontWeight: FontWeight.bold)))),
+                        const Expanded(child: Center(child: Text('Seleccionar Cantidad'))),
+                        Expanded(
+                          child: Center(
+                            child: CounterSlider(
+                              value: lineaTemp.cantidad,
+                              width: 200,
+                              height: 50,
+                              slideFactor: 1.4,
+                              onChanged: (i) {
+                                setState(() {
+                                  lineaTemp.cantidad = i;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                                filled: true,
+                                label: Row(
+                                  children: const [
+                                    Icon(Icons.newspaper_outlined),
+                                    Text('Detalles')
+                                  ],
+                                ),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                    const BorderSide(color: Colors.black45))),
+                            onChanged: (value) {
+                              lineaTemp.detalle = value;
+                            },
+                          ),
+                        ),
+                        IconsButton(
+                          onPressed: () async {
+                            for (var x in lineasComandas) {
+                              if (x.idProducto == prodTemp.id) {
+                                await DBConnection.rawQuery(
+                                    'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
+                              } else {
+                                await DBConnection.rawQuery(
+                                  //TODO: Poner el trabajador que incia sesión.
+                                    'Insert into res_lineas_comandas (id, cantidad, trabajador, precio, idProducto, idMesa, enviado) values (${lineaTemp.id}, ${lineaTemp.cantidad},1, ${lineaTemp.cantidad * prodTemp.precio}, ${lineaTemp.idProducto}, ${lineaTemp.idMesa}, ${lineaTemp.enviado})');
+                              }
+                            }
+                            Navigator.pop(context);
+                          },
+                          text: 'Guardar',
+                          iconData: Icons.save_alt,
+                          color: Colors.green,
+                          textStyle: const TextStyle(color: Colors.white),
+                          iconColor: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },)
+        );
         openCounter = false;
       }
     });
@@ -231,31 +319,42 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
           strokeColor: Colors.orangeAccent,
           items: [
             CustomNavigationBarItem(
-              icon: const Icon(Icons.shopping_basket_outlined),
-              selectedIcon: const Icon(Icons.shopping_basket_outlined, color: Colors.orangeAccent)
-            ),
+                icon: const Icon(Icons.shopping_basket_outlined),
+                selectedIcon: const Icon(Icons.shopping_basket_outlined,
+                    color: Colors.orangeAccent)),
             CustomNavigationBarItem(
-              icon: const Icon(Icons.send),
-              selectedIcon:  const Icon(Icons.send, color: Colors.orangeAccent)
-            ),
+                icon: const Icon(Icons.send),
+                selectedIcon:
+                    const Icon(Icons.send, color: Colors.orangeAccent)),
             CustomNavigationBarItem(
-              icon: const Icon(Icons.home),
-              selectedIcon:  const Icon(Icons.home, color: Colors.orangeAccent)
-            ),
+                icon: const Icon(Icons.home),
+                selectedIcon:
+                    const Icon(Icons.home, color: Colors.orangeAccent)),
             CustomNavigationBarItem(
-              icon: const Icon(Icons.arrow_circle_left),
-              selectedIcon:  const Icon(Icons.arrow_circle_left, color: Colors.orangeAccent)
-            ),
+                icon: const Icon(Icons.arrow_circle_left),
+                selectedIcon: const Icon(Icons.arrow_circle_left,
+                    color: Colors.orangeAccent)),
           ],
           currentIndex: index,
           onTap: (i) {
             setState(() {
               index = i;
-              switch(index) {
+              switch (index) {
                 case 0:
-                 break;
+                  DropDownState(DropDown(
+                    data: [
+                      for (var x in lineasComandas)
+                        for (var i in productos)
+                          if (i.id == x.idProducto)
+                            SelectedListItem(
+                                name:
+                                    '${i.nombre} -- Cantidad: ${x.cantidad} -- ${x.precio}€',
+                                value: x.id.toString()),
+                    ],
+                  )).showModal(context);
+                  break;
                 case 1:
-
+                  break;
                 case 2:
                   Navigator.pushReplacementNamed(context, HomeScreen.routeName);
                   break;

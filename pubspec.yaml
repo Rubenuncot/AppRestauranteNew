@@ -52,6 +52,8 @@ dependencies:
   counter_slider: ^0.1.0
   material_dialogs: ^1.1.4
   custom_navigation_bar: ^0.8.2
+  mysql1: ^0.20.0
+  animated_flip_counter: ^0.2.5
 
 dev_dependencies:
   flutter_test:
