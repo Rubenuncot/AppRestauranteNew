@@ -280,6 +280,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
                         ),
                         IconsButton(
                           onPressed: () async {
+                            getList();
                             for (var x in lineasComandas) {
                               if (x.idProducto == prodTemp.id) {
                                 await DBConnection.rawQuery(
@@ -338,6 +339,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
           currentIndex: index,
           onTap: (i) {
             setState(() {
+              getList();
               index = i;
               switch (index) {
                 case 0:
