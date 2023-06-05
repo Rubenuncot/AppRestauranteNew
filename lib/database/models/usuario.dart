@@ -24,7 +24,7 @@ class Usuario {
       Usuario.fromJson(json.decode(str));
 
   factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
-      id:json['id'],
+      id:int.parse('${json['id']}'),
       name: json['name'],
       apellido: json['apellidos'],
       dni: json['dni'],

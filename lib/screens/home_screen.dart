@@ -259,8 +259,6 @@ class _HomeScreenState extends State<HomeScreen> {
     )).showModal(context);
   }
 
-  insertarRegistro() async {}
-
   printRegistro() async {}
 
   Future<void> logOut() async {
@@ -387,23 +385,25 @@ class _HomeScreenState extends State<HomeScreen> {
         image: 'assets/carta.png',
         textShadowColor: const Color.fromARGB(255, 193, 168, 255),
         textColor: Colors.white,
-        onTap: insertarRegistro,
-      ),
-      ListElement(
-        gradientColors: const [
-          Color.fromARGB(255, 255, 98, 98),
-          Color.fromARGB(255, 255, 150, 115)
-        ],
-        boxShadowColor: Colors.orangeAccent,
-        subTitle: '',
-        title: 'Reservas',
-        image: 'assets/calendario.png',
-        textShadowColor: const Color.fromARGB(255, 255, 150, 115),
-        textColor: Colors.white,
         onTap: () {
-          showDialogSalas(2);
+          Navigator.pushNamed(context, CartaScreen.routeName);
         },
       ),
+      // ListElement(
+      //   gradientColors: const [
+      //     Color.fromARGB(255, 255, 98, 98),
+      //     Color.fromARGB(255, 255, 150, 115)
+      //   ],
+      //   boxShadowColor: Colors.orangeAccent,
+      //   subTitle: '',
+      //   title: 'Reservas',
+      //   image: 'assets/calendario.png',
+      //   textShadowColor: const Color.fromARGB(255, 255, 150, 115),
+      //   textColor: Colors.white,
+      //   onTap: () {
+      //     showDialogSalas(2);
+      //   },
+      // ),
       ListElement(
         gradientColors: const [
           Color.fromARGB(255, 255, 98, 218),
@@ -420,6 +420,25 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             // DBConnection.insert();
             // waiting = true;
+            Navigator.pushNamed(context, SettingsScreen.routeName);
+          });
+        },
+      ),
+      ListElement(
+        gradientColors: const [
+          Color.fromARGB(255, 98, 255, 190),
+          Color.fromARGB(255, 192, 255, 115)
+        ],
+        boxShadowColor: const Color.fromARGB(255, 0, 179, 211),
+        subTitle: '',
+        // subTitle: 'Día: ${DateTime.now().day < 10 ? '0${DateTime.now().day}' : DateTime.now().day} / ${DateTime.now().month < 10 ? '0${DateTime.now().month}' : DateTime.now().month} / ${DateTime.now().year}',
+        title: 'Cerrar Sesión',
+        image: 'assets/cerrar-sesion.png',
+        textShadowColor: const Color.fromARGB(255, 25, 90, 255),
+        textColor: Colors.white,
+        onTap: () {
+          setState(() {
+            waiting = true;
           });
         },
       ),

@@ -6,8 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../database/models/models.dart';
+
 class Preferences {
   static late SharedPreferences _prefs;
+  static Usuario _usuario = Usuario(id: 0, name: 'name', apellido: 'apellido', dni: 'dni', email: 'email', imagenQr: Uint8List.fromList([]), codigoQr: 'codigoQr');
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -56,5 +59,12 @@ class Preferences {
 
   static bool getLoginStateFromPreferences(){
     return _prefs.getBool('loginState') ?? true;
+  }
+
+  static Usuario get usuario => Usuario.fromJson(json.decode(_prefs.getString('usuario') ?? ''));
+
+  static set usuario(Usuario value) {
+    _usuario = value;
+    _prefs.setString('usuario', jsonEncode(_usuario));
   }
 }

@@ -54,6 +54,8 @@ dependencies:
   custom_navigation_bar: ^0.8.2
   mysql1: ^0.20.0
   animated_flip_counter: ^0.2.5
+  flutter_barcode_scanner: ^2.0.0
+  cherry_toast: ^1.2.1
 
 dev_dependencies:
   flutter_test:

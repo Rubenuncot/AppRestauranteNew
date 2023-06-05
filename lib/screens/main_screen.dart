@@ -1,13 +1,18 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_widgets/database/models/models.dart';
 import 'package:prueba_widgets/globalDatabase/db_connection.dart';
 import 'package:prueba_widgets/providers/log_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
 import 'package:prueba_widgets/shared_preferences/preferences.dart';
-
-import '../providers/api_provider.dart';
 
 class MainScreen extends StatefulWidget {
   static String routeName = '_main';
@@ -123,9 +128,26 @@ class CuadradoDelMedio extends StatelessWidget {
 
             Center(
               child: MaterialButton(
-                onPressed: () {
-                  // Todo: Poner lo de la lectura del código qr
-                  Provider.of<LogProvider>(context, listen: false).waiting = true;
+                onPressed: () async{
+                  LogProvider logProvider = Provider.of<LogProvider>(context, listen: false);
+                  dynamic users = await DBConnection.rawQuery('Select * from res_users');
+
+                  for(var x in users){
+                    Blob blob = x[10];
+                    print(blob.toBytes());
+                    logProvider.users.add(Usuario(id: x[0], name: x[1], apellido: x[6], dni: x[8], email: x[2], imagenQr: Uint8List.fromList(blob.toBytes()), codigoQr: x[9]));
+                  }
+                  String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                      '#0791e0',
+                      'Cancelar',
+                      true,
+                      ScanMode.QR);
+                  for(var x in logProvider.users){
+                    if(barcodeScanRes == x.codigoQr){
+                      Preferences.usuario = x;
+                      logProvider.waiting = true;
+                    }
+                  }
                 },
                 padding: const EdgeInsets.all(20),
                 color: const Color.fromARGB(255, 38, 246, 246),

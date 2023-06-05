@@ -1,32 +1,23 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 
-import 'package:animated_flip_counter/animated_flip_counter.dart';
+import 'package:cherry_toast/cherry_toast.dart';
 import 'package:counter_slider/counter_slider.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:drop_down_list/drop_down_list.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
-import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:material_dialogs/dialogs.dart';
-import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
-import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/database/models/familia.dart';
 import 'package:prueba_widgets/database/models/models.dart';
 import 'package:prueba_widgets/database/services/db_service.dart';
 import 'package:prueba_widgets/globalDatabase/db_connection.dart';
-import 'package:prueba_widgets/providers/api_provider.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
-import 'package:prueba_widgets/screens/main_screen.dart';
-import 'package:prueba_widgets/screens/salas_screen.dart';
+import 'package:prueba_widgets/shared_preferences/preferences.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
-import 'package:sweet_nav_bar/sweet_nav_bar.dart';
 
 class MesaScreen extends StatefulWidget {
   static String routeName = '_mesa';
@@ -44,6 +35,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
   bool openProductos = false;
   bool openCounter = false;
   bool estaSolicitado = false;
+  bool updated = false;
 
   //----- Int -----
   int index = 2;
@@ -71,7 +63,13 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
     await DBProvider.db.newReg(lineaTemp);
   }
 
-  void getList() async {
+  sendTicket() async {
+    for(var x in lineasComandas){
+      await DBConnection.rawQuery('Update res_lineas_comandas set ticket = 1, fechaTicket = ${DateTime.now()}');
+    }
+  }
+  
+  Future<void> getList() async {
     SalasProvider salasProvider =
         Provider.of<SalasProvider>(context, listen: false);
     mesaId = salasProvider.idMesa;
@@ -80,20 +78,20 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
     final familiasRes =
         await DBConnection.rawQuery('Select * from res_tipo_productos');
     final lineasComandasRes = await DBConnection.rawQuery(
-        'Select * from res_lineas_comandas where idMesa = $mesaId');
+        'Select * from res_lineas_comandas where idMesa = $mesaId and ticket = 0');
     final comandasRes = await DBConnection.rawQuery(
         'Select * from res_comandas where id = $mesaId');
-    final lineasComandasAllRes = await DBConnection.rawQuery(
-        'Select * from res_lineas_comandas');
+    final lineasComandasAllRes =
+        await DBConnection.rawQuery('Select * from res_lineas_comandas');
 
     for (var x in lineasComandasAllRes) {
       lineasComandasAll.add(LineasComanda(
           id: x[0],
-          precio: x[4],
+          precio: x[5],
           idProducto: x[3],
           idMesa: x[1],
-          cantidad: x[5],
-          enviado: x[6]));
+          cantidad: x[6],
+          enviado: x[7]));
     }
 
     for (var x in comandasRes) {
@@ -114,11 +112,11 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
     for (var x in lineasComandasRes) {
       lineasComandas.add(LineasComanda(
           id: x[0],
-          precio: x[4],
+          precio: x[5],
           idProducto: x[3],
           idMesa: x[1],
-          cantidad: x[5],
-          enviado: x[6]));
+          cantidad: x[6],
+          enviado: x[7]));
     }
 
     familias = [
@@ -160,17 +158,25 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
     });
   }
 
-  sum(i){
+  sum(i) {
     setState(() {
       cant = i;
     });
   }
+
   /* Overrides */
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async{
     super.didChangeDependencies();
-
-    getList();
+    familias = [];
+    familiasTipo = [];
+    productos = [];
+    productosFamilia = [];
+    comandas = [];
+    comandasMesa = [];
+    lineasComandas = [];
+    lineasComandasAll = [];
+    await getList();
   }
 
   @override
@@ -214,98 +220,131 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
             prodTemp = x;
           }
         }
-        for (var x in lineasComandas) {
-          if (x.idProducto == prodTemp.id) {
-            lineaTemp = x;
-          } else {
-            lineaTemp = LineasComanda(
-                id: lineasComandasAll.last.id + 1,
-                precio: prodTemp.precio,
-                idProducto: prodTemp.id,
-                cantidad: 0,
-                enviado: 0,
-                detalle: '',
-                idMesa: mesaId);
+        if(lineasComandas.isNotEmpty){
+          for (var x in lineasComandas) {
+            if (x.idProducto == prodTemp.id) {
+              lineaTemp = x;
+            } else {
+              lineaTemp = LineasComanda(
+                  id: lineasComandasAll.last.id + 1,
+                  precio: prodTemp.precio,
+                  idProducto: prodTemp.id,
+                  cantidad: 0,
+                  enviado: 0,
+                  detalle: '',
+                  idMesa: mesaId);
+            }
           }
+        } else {
+          lineaTemp = LineasComanda(
+              id: lineasComandasAll.last.id + 1,
+              precio: prodTemp.precio,
+              idProducto: prodTemp.id,
+              cantidad: 0,
+              enviado: 0,
+              detalle: '',
+              idMesa: mesaId);
         }
-        showDialog(context: context,
-            builder: (context) => StatefulBuilder(builder: (context, setState) {
-              return Dialog(
-                child: Container(
-                  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height *0.3, maxWidth: MediaQuery.of(context).size.width *0.8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(150),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Expanded(child: Center(child: Text('Ensalada César', style: TextStyle(fontWeight: FontWeight.bold)))),
-                        const Expanded(child: Center(child: Text('Seleccionar Cantidad'))),
-                        Expanded(
-                          child: Center(
-                            child: CounterSlider(
-                              value: lineaTemp.cantidad,
-                              width: 200,
-                              height: 50,
-                              slideFactor: 1.4,
-                              onChanged: (i) {
-                                setState(() {
-                                  lineaTemp.cantidad = i;
-                                });
-                              },
-                            ),
-                          ),
+
+        showDialog(
+            context: context,
+            builder: (context) => StatefulBuilder(
+                  builder: (context, setState) {
+                    return Dialog(
+                      child: Container(
+                        constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.3,
+                            maxWidth: MediaQuery.of(context).size.width * 0.8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(150),
                         ),
-                        Expanded(
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                                filled: true,
-                                label: Row(
-                                  children: const [
-                                    Icon(Icons.newspaper_outlined),
-                                    Text('Detalles')
-                                  ],
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                  child: Center(
+                                      child: Text(prodTemp.nombre,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold)))),
+                              const Expanded(
+                                  child: Center(
+                                      child: Text('Seleccionar Cantidad'))),
+                              Expanded(
+                                child: Center(
+                                  child: CounterSlider(
+                                    value: lineaTemp.cantidad,
+                                    width: 200,
+                                    height: 50,
+                                    slideFactor: 1.4,
+                                    onChanged: (i) {
+                                      setState(() {
+                                        lineaTemp.cantidad = i;
+                                      });
+                                    },
+                                  ),
                                 ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    borderSide:
-                                    const BorderSide(color: Colors.black45))),
-                            onChanged: (value) {
-                              lineaTemp.detalle = value;
-                            },
+                              ),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                      filled: true,
+                                      label: Row(
+                                        children: const [
+                                          Icon(Icons.newspaper_outlined),
+                                          Text('Detalles')
+                                        ],
+                                      ),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          borderSide: const BorderSide(
+                                              color: Colors.black45))),
+                                  onChanged: (value) {
+                                    lineaTemp.detalle = value;
+                                  },
+                                ),
+                              ),
+                              IconsButton(
+                                onPressed: () async {
+                                  familias = [];
+                                  familiasTipo = [];
+                                  productos = [];
+                                  productosFamilia = [];
+                                  comandas = [];
+                                  comandasMesa = [];
+                                  lineasComandas = [];
+                                  lineasComandasAll = [];
+                                  await getList();
+                                  for (var x in lineasComandas) {
+                                    if (x.idProducto == prodTemp.id) {
+                                      await DBConnection.rawQuery(
+                                          'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
+                                      updated = true;
+                                    }
+                                  }
+                                  if(!updated){
+                                    await DBConnection.rawQuery(
+                                        'Insert into res_lineas_comandas (id, cantidad, trabajador, precio, idProducto, idMesa, enviado, ticket, fechaTicket) values (${lineaTemp.id}, ${lineaTemp.cantidad}, ${Preferences.usuario.id}, ${lineaTemp.cantidad * prodTemp.precio}, ${lineaTemp.idProducto}, ${lineaTemp.idMesa}, ${lineaTemp.enviado}, 0, "${DateTime.now()}")');
+                                    updated = false;
+                                  }
+                                  Navigator.pop(context);
+                                },
+                                text: 'Guardar',
+                                iconData: Icons.save_alt,
+                                color: Colors.green,
+                                textStyle: const TextStyle(color: Colors.white),
+                                iconColor: Colors.white,
+                              ),
+                            ],
                           ),
                         ),
-                        IconsButton(
-                          onPressed: () async {
-                            getList();
-                            for (var x in lineasComandas) {
-                              if (x.idProducto == prodTemp.id) {
-                                await DBConnection.rawQuery(
-                                    'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
-                              } else {
-                                await DBConnection.rawQuery(
-                                  //TODO: Poner el trabajador que incia sesión.
-                                    'Insert into res_lineas_comandas (id, cantidad, trabajador, precio, idProducto, idMesa, enviado) values (${lineaTemp.id}, ${lineaTemp.cantidad},1, ${lineaTemp.cantidad * prodTemp.precio}, ${lineaTemp.idProducto}, ${lineaTemp.idMesa}, ${lineaTemp.enviado})');
-                              }
-                            }
-                            Navigator.pop(context);
-                          },
-                          text: 'Guardar',
-                          iconData: Icons.save_alt,
-                          color: Colors.green,
-                          textStyle: const TextStyle(color: Colors.white),
-                          iconColor: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },)
-        );
+                      ),
+                    );
+                  },
+                ));
         openCounter = false;
       }
     });
@@ -337,25 +376,179 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
                     color: Colors.orangeAccent)),
           ],
           currentIndex: index,
-          onTap: (i) {
+          onTap: (i) async{
+            familias = [];
+            familiasTipo = [];
+            productos = [];
+            productosFamilia = [];
+            comandas = [];
+            comandasMesa = [];
+            lineasComandas = [];
+            lineasComandasAll = [];
+            await getList();
             setState(() {
-              getList();
               index = i;
               switch (index) {
                 case 0:
                   DropDownState(DropDown(
                     data: [
+                      SelectedListItem(name: 'Producto     --     Cantidad     --     Precio', value: 'cabecera'),
+                      SelectedListItem(name: '______________________________________', value: 'cabecera'),
                       for (var x in lineasComandas)
                         for (var i in productos)
                           if (i.id == x.idProducto)
                             SelectedListItem(
                                 name:
-                                    '${i.nombre} -- Cantidad: ${x.cantidad} -- ${x.precio}€',
+                                    '${i.nombre} -- ${x.cantidad} -- ${x.precio}€',
                                 value: x.id.toString()),
                     ],
+                    selectedItems: (selectedItems) async {
+                      for (var x in selectedItems) {
+                        if(x.value == 'cabecera'){
+                          Navigator.pop(context);
+                        } else {
+                          LineasComanda lineaTemp = LineasComanda(
+                              id: 0,
+                              precio: 0,
+                              idProducto: 0,
+                              cantidad: 0,
+                              enviado: 0,
+                              detalle: '',
+                              idMesa: 0);
+                          Producto prodTemp = Producto(
+                              nombre: 'nombre',
+                              idTipo: 1,
+                              descripcion: 'descripcion',
+                              precio: 7,
+                              idFamilia: 1,
+                              id: 0);
+                          dynamic listRes = await DBConnection.rawQuery(
+                              'Select * from res_lineas_comandas where id = ${x.value}');
+                          dynamic listProdRes = await DBConnection.rawQuery(
+                              'Select * from res_productos where id = ${x.value}');
+                          for (var i in listRes) {
+                            lineaTemp = LineasComanda(
+                                id: i[0],
+                                precio: i[5],
+                                idProducto: i[3],
+                                idMesa: i[1],
+                                cantidad: i[6],
+                                enviado: i[7]);
+                          }
+                          showDialog(
+                              context: context,
+                              builder: (context) => StatefulBuilder(
+                                builder: (context, setState) {
+                                  return Dialog(
+                                    child: Container(
+                                      constraints: BoxConstraints(
+                                          maxHeight: MediaQuery.of(context)
+                                              .size
+                                              .height *
+                                              0.3,
+                                          maxWidth: MediaQuery.of(context)
+                                              .size
+                                              .width *
+                                              0.8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                        BorderRadius.circular(150),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                          children: [
+                                            Expanded(
+                                                child: Center(
+                                                    child: Text(
+                                                        prodTemp.nombre,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                            FontWeight
+                                                                .bold)))),
+                                            const Expanded(
+                                                child: Center(
+                                                    child: Text(
+                                                        'Seleccionar Cantidad'))),
+                                            Expanded(
+                                              child: Center(
+                                                child: CounterSlider(
+                                                  value: lineaTemp.cantidad,
+                                                  width: 200,
+                                                  height: 50,
+                                                  slideFactor: 1.4,
+                                                  onChanged: (i) {
+                                                    setState(() {
+                                                      lineaTemp.cantidad = i;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                    filled: true,
+                                                    label: Row(
+                                                      children: const [
+                                                        Icon(Icons
+                                                            .newspaper_outlined),
+                                                        Text('Detalles')
+                                                      ],
+                                                    ),
+                                                    border: OutlineInputBorder(
+                                                        borderRadius:
+                                                        BorderRadius
+                                                            .circular(20),
+                                                        borderSide:
+                                                        const BorderSide(
+                                                            color: Colors
+                                                                .black45))),
+                                                onChanged: (value) {
+                                                  lineaTemp.detalle = value;
+                                                },
+                                              ),
+                                            ),
+                                            IconsButton(
+                                              onPressed: () async {
+                                                familias = [];
+                                                familiasTipo = [];
+                                                productos = [];
+                                                productosFamilia = [];
+                                                comandas = [];
+                                                comandasMesa = [];
+                                                lineasComandas = [];
+                                                lineasComandasAll = [];
+                                                await getList();
+                                                await DBConnection.rawQuery(
+                                                    'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
+                                                Navigator.pop(context);
+                                              },
+                                              text: 'Guardar',
+                                              iconData: Icons.save_alt,
+                                              color: Colors.green,
+                                              textStyle: const TextStyle(
+                                                  color: Colors.white),
+                                              iconColor: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ));
+                        }
+                      }
+                    },
                   )).showModal(context);
                   break;
                 case 1:
+                  sendTicket();
+                  CherryToast.success(title: const Text('Enviado'));
                   break;
                 case 2:
                   Navigator.pushReplacementNamed(context, HomeScreen.routeName);
@@ -371,39 +564,6 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
       body: SafeArea(
         child: Column(
           children: [
-            Hero(
-              tag: mesaNombre,
-              child: CustomFuncyCard(
-                maxHeight: 200,
-                gradientColors: const [
-                  Color.fromARGB(255, 44, 216, 255),
-                  Color.fromARGB(255, 103, 235, 255)
-                ],
-                boxShadowColor: Colors.transparent,
-                image: 'assets/comida-sana.png',
-                roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
-                textShadowColor: const Color.fromARGB(255, 168, 252, 255),
-                textColor: Colors.white,
-                title: Text(
-                  'Último artículo',
-                  style: GoogleFonts.titanOne(
-                      color: Colors.white,
-                      fontSize: 15,
-                      shadows: const [
-                        Shadow(color: Colors.orangeAccent, blurRadius: 20)
-                      ]),
-                ),
-                child: Column(
-                  children: [
-                    const Divider(),
-                    Text(
-                      'Cocacola',
-                      style: GoogleFonts.manjari(fontSize: 15),
-                    ),
-                  ],
-                ),
-              ),
-            ),
             Expanded(
               child: FlexibleGridView(
                 axisCount: GridLayoutEnum.twoElementsInRow,
