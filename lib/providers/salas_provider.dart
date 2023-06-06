@@ -11,6 +11,15 @@ class SalasProvider extends ChangeNotifier {
   List<String> nombresMesas = [];
   bool _notAdd = false;
   int _cantidad = 0;
+  int _counter = 0;
+
+
+  int get counter => _counter;
+
+  set counter(int value) {
+    _counter = value;
+    notifyListeners();
+  }
 
   String get mesaActual => _mesaActual;
 

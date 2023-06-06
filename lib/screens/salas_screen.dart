@@ -59,28 +59,28 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
           salaActual = x.nombre.substring(0, 1);
           switch (salaActual) {
             case 'T':
-              iconStr = 'assets/terraza.png';
+              iconStr = 'https://i.imgur.com/epj3f5K.png';
               colors = const [
                 Color.fromARGB(255, 93, 255, 182),
                 Color.fromARGB(255, 104, 255, 232)
               ];
               break;
             case 'S':
-              iconStr = 'assets/restaurante.png';
+              iconStr = 'https://i.imgur.com/svwhuX7.png';
               colors = const [
                 Color.fromARGB(255, 255, 93, 93),
                 Color.fromARGB(255, 255, 190, 104)
               ];
               break;
             case 'B':
-              iconStr = 'assets/barra-de-bar.png';
+              iconStr = 'https://i.imgur.com/FUNOnfc.png';
               colors = const [
                 Color.fromARGB(255, 93, 158, 255),
                 Color.fromARGB(255, 104, 210, 255)
               ];
               break;
             default:
-              iconStr = 'assets/cena.png';
+              iconStr = 'https://i.imgur.com/WiBn4yi.png';
               colors = const [
                 Color.fromARGB(255, 152, 93, 255),
                 Color.fromARGB(255, 222, 104, 255)
@@ -180,7 +180,7 @@ class _SalaScreenState extends State<SalaScreen> with WidgetsBindingObserver {
                         Color.fromARGB(255, 103, 235, 255)
                       ],
                       boxShadowColor: Colors.transparent,
-                      image: 'assets/comida-sana.png',
+                      image: 'https://i.imgur.com/S65XxEZ.png',
                       roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
                       textShadowColor: const Color.fromARGB(255, 168, 252, 255),
                       textColor: Colors.white,

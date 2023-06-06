@@ -103,9 +103,9 @@ class CustomContainer extends StatelessWidget {
             child: Container(
                 constraints: const BoxConstraints(maxHeight: 80),
                 child: FadeInImage(
-                    placeholder: AssetImage(image), image: AssetImage(image))),
+                    placeholder: const NetworkImage('https://i.imgur.com/j9uCxbG.gif'), image: NetworkImage(image)),
           ),
-        ]),
+          )]),
       );
   }
 }

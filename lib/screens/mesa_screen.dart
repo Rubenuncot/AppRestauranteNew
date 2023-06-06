@@ -16,6 +16,7 @@ import 'package:prueba_widgets/database/services/db_service.dart';
 import 'package:prueba_widgets/globalDatabase/db_connection.dart';
 import 'package:prueba_widgets/providers/salas_provider.dart';
 import 'package:prueba_widgets/screens/home_screen.dart';
+import 'package:prueba_widgets/screens/salas_screen.dart';
 import 'package:prueba_widgets/shared_preferences/preferences.dart';
 import 'package:prueba_widgets/widgets/widgets.dart';
 
@@ -41,6 +42,8 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
   int index = 2;
   int mesaId = 0;
   int cant = 0;
+  int counter = 0;
+  int lineasComandasId = 0;
 
   //----- Strings -----
   String mesaNombre = '';
@@ -64,9 +67,43 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
   }
 
   sendTicket() async {
-    for(var x in lineasComandas){
-      await DBConnection.rawQuery('Update res_lineas_comandas set ticket = 1, fechaTicket = ${DateTime.now()}');
+    dynamic listRes = await DBConnection.rawQuery('Select * from res_lineas_comandas where ticket = 0 and idMesa = $mesaId');
+    for(var x in listRes){
+      print(x[1]);
+      counter ++;
     }
+    for(var x in lineasComandas){
+      await DBConnection.rawQuery('Update res_lineas_comandas set ticket = 1, fechaTicket = "${DateTime.now()}"');
+    }
+    setState(() {
+
+    });
+  }
+
+  sendComanda() async {
+    SalasProvider salasProvider = Provider.of<SalasProvider>(context, listen: false);
+    dynamic listRes = await DBConnection.rawQuery('Select * from res_lineas_comandas where enviado = 0 and idMesa = $mesaId');
+    List lineasComandasEnviado = [];
+    counter = 0;
+    for(var x in listRes){
+      print(x[1]);
+      setState(() {
+        counter ++;
+      });
+      lineasComandasEnviado.add(LineasComanda(
+          id: x[0],
+          precio: x[5],
+          idProducto: x[3],
+          idMesa: x[1],
+          cantidad: x[6],
+          enviado: x[7]));
+    }
+
+    for(var x in lineasComandasEnviado){
+      await DBConnection.rawQuery('Update res_lineas_comandas set enviado = 1 where id = ${x.id}');
+    }
+
+    return counter;
   }
   
   Future<void> getList() async {
@@ -93,6 +130,11 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
           cantidad: x[6],
           enviado: x[7]));
     }
+    if(lineasComandasAll.isNotEmpty){
+      lineasComandasId = lineasComandasAll.last.id + 1;
+    } else {
+      lineasComandasId = 1;
+    }
 
     for (var x in comandasRes) {
       comandas.add(Comanda(id: x[0], precioTotal: x[1]));
@@ -107,7 +149,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
           idTipo: x[5]));
     }
     for (var x in familiasRes) {
-      familiasTipo.add(Familia(id: x[0], nombre: x[1]));
+      familiasTipo.add(Familia(id: x[0], nombre: x[1], icono: x[2]));
     }
     for (var x in lineasComandasRes) {
       lineasComandas.add(LineasComanda(
@@ -129,7 +171,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
             Color.fromARGB(255, 227, 255, 103)
           ],
           boxShadowColor: Colors.orangeAccent,
-          image: 'assets/lata-de-refresco.png',
+          image: familia.icono,
           textShadowColor: const Color.fromARGB(255, 168, 252, 255),
           textColor: Colors.white,
           onTap: () {
@@ -226,7 +268,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
               lineaTemp = x;
             } else {
               lineaTemp = LineasComanda(
-                  id: lineasComandasAll.last.id + 1,
+                  id: lineasComandasId + 1,
                   precio: prodTemp.precio,
                   idProducto: prodTemp.id,
                   cantidad: 0,
@@ -237,7 +279,7 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
           }
         } else {
           lineaTemp = LineasComanda(
-              id: lineasComandasAll.last.id + 1,
+              id: lineasComandasId + 1,
               precio: prodTemp.precio,
               idProducto: prodTemp.id,
               cantidad: 0,
@@ -322,12 +364,16 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
                                     if (x.idProducto == prodTemp.id) {
                                       await DBConnection.rawQuery(
                                           'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
+                                      await DBConnection.rawQuery(
+                                          'Update res_lineas_comandas set enviado = 0 where id = ${lineaTemp.id}');
+
                                       updated = true;
                                     }
                                   }
                                   if(!updated){
                                     await DBConnection.rawQuery(
                                         'Insert into res_lineas_comandas (id, cantidad, trabajador, precio, idProducto, idMesa, enviado, ticket, fechaTicket) values (${lineaTemp.id}, ${lineaTemp.cantidad}, ${Preferences.usuario.id}, ${lineaTemp.cantidad * prodTemp.precio}, ${lineaTemp.idProducto}, ${lineaTemp.idMesa}, ${lineaTemp.enviado}, 0, "${DateTime.now()}")');
+                                    lineasComandasId = lineaTemp.id;
                                     updated = false;
                                   }
                                   Navigator.pop(context);
@@ -386,7 +432,6 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
             lineasComandas = [];
             lineasComandasAll = [];
             await getList();
-            setState(() {
               index = i;
               switch (index) {
                 case 0:
@@ -525,6 +570,9 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
                                                 await getList();
                                                 await DBConnection.rawQuery(
                                                     'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
+                                                await DBConnection.rawQuery(
+                                                    'Update res_lineas_comandas set cantidad = ${lineaTemp.cantidad}, precio = ${lineaTemp.cantidad * prodTemp.precio} where id = ${lineaTemp.id}');
+
                                                 Navigator.pop(context);
                                               },
                                               text: 'Guardar',
@@ -547,8 +595,8 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
                   )).showModal(context);
                   break;
                 case 1:
-                  sendTicket();
-                  CherryToast.success(title: const Text('Enviado'));
+
+                  if(await sendComanda() > 0) CherryToast.success(title: Text('Enviado')).show(context);
                   break;
                 case 2:
                   Navigator.pushReplacementNamed(context, HomeScreen.routeName);
@@ -557,7 +605,6 @@ class _MesaScreenState extends State<MesaScreen> with WidgetsBindingObserver {
                   Navigator.pop(context);
                   break;
               }
-            });
           },
         ),
       ),

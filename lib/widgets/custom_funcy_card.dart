@@ -113,7 +113,7 @@ class CustomFuncyCard extends StatelessWidget {
             child: Container(
                 constraints: const BoxConstraints(maxHeight: 80),
                 child: FadeInImage(
-                    placeholder: AssetImage(image), image: AssetImage(image))),
+                    placeholder: NetworkImage(image), image: NetworkImage(image))),
           ),
         ]),
       ),

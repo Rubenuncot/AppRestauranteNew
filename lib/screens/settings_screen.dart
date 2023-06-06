@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -47,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Color.fromARGB(255, 210, 246, 255)
         ],
         boxShadowColor: const Color.fromARGB(255, 255, 244, 215),
-        image: 'assets/usuario.png',
+        image: 'https://i.imgur.com/23w1Nno.png',
         roundedBoxColor: const Color.fromARGB(166, 184, 255, 255),
         textShadowColor: const Color.fromARGB(255, 168, 252, 255),
         textColor: Colors.white,
@@ -73,7 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Color.fromARGB(255, 240, 255, 210)
         ],
         boxShadowColor: const Color.fromARGB(255, 255, 216, 215),
-        image: 'assets/cambiar-usuario.png',
+        image: 'https://i.imgur.com/kZT5gmX.png',
         roundedBoxColor: const Color.fromARGB(166, 184, 255, 193),
         textShadowColor: const Color.fromARGB(255, 168, 255, 229),
         textColor: Colors.white,
@@ -87,6 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ]),
         ),
         onTap: () {
+          Provider.of<LogProvider>(context, listen: false).waiting = false;
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         },
       ),
@@ -97,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Color.fromARGB(255, 210, 255, 247)
         ],
         boxShadowColor: const Color.fromARGB(255, 215, 255, 229),
-        image: 'assets/cerrar-sesion.png',
+        image: 'https://i.imgur.com/HqeTzRh.png',
         roundedBoxColor: const Color.fromARGB(166, 184, 212, 255),
         textShadowColor: const Color.fromARGB(255, 226, 168, 255),
         textColor: Colors.white,
@@ -138,11 +138,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Center(child: Text('Apellidos: ${Preferences.usuario.apellido}'),),
-                  Center(child: Text('Dni: ${Preferences.usuario.dni}'),),
-                  Center(child: Text('Correo Electrónico: ${Preferences.usuario.email}'),),
-                  Center(child: FadeInImage(placeholder: const AssetImage('assets/usuario.png'), image: MemoryImage(Preferences.usuario.imagenQr),)),
-                  // Center(child: Image.memory(logProvider.user.imagenQr)),
+                  SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      child: const FadeInImage(
+                          placeholder:
+                              NetworkImage('https://i.imgur.com/G2nFuDj.png'),
+                          image:
+                              NetworkImage('https://i.imgur.com/G2nFuDj.png'))),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Center(
+                    child: Text('Apellidos:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Center(
+                    child: Text(Preferences.usuario.apellido),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Center(
+                    child: Text('Dni:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Center(
+                    child: Text(Preferences.usuario.dni),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Center(
+                    child: Text('Correo Electrónico:', style: TextStyle(fontWeight: FontWeight.bold),),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Center(
+                    child: Text(Preferences.usuario.email),
+                  ),
                 ],
               ),
             ),
@@ -189,7 +228,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.pop(context),
               elevation: 0,
               backgroundColor: Colors.redAccent,
-              heroTag: Provider.of<SalasProvider>(context, listen: false).heroMesa,
+              heroTag:
+                  Provider.of<SalasProvider>(context, listen: false).heroMesa,
               child: const Icon(Icons.arrow_back),
             ),
             body: SingleChildScrollView(

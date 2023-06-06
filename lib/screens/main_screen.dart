@@ -7,6 +7,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/database/models/models.dart';
 import 'package:prueba_widgets/globalDatabase/db_connection.dart';
@@ -28,6 +29,11 @@ class _MainScreenState extends State<MainScreen> {
     await Future.delayed(const Duration(seconds: 3));
     Preferences.saveLoginStateToPreferences(false);
     Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -64,8 +70,8 @@ class _MainScreenState extends State<MainScreen> {
                         margin: EdgeInsets.symmetric(vertical: 50, horizontal: MediaQuery.of(context).size.width * 0.3),
                         constraints: const BoxConstraints(maxHeight: 200),
                         child: const FadeInImage(
-                            placeholder: AssetImage('assets/perfilusuario.png'),
-                            image: AssetImage('assets/perfilusuario.png'))),
+                            placeholder: NetworkImage('https://i.imgur.com/G2nFuDj.png'),
+                            image: NetworkImage('https://i.imgur.com/G2nFuDj.png'))),
                     SingleChildScrollView(child: Container(
                       margin: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.5),
                         child: const CuadradoDelMedio())
@@ -115,8 +121,8 @@ class CuadradoDelMedio extends StatelessWidget {
                   child: const ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                     child: FadeInImage(
-                      image: AssetImage('assets/restaurante.jpg'),
-                      placeholder: AssetImage('assets/restaurante.jpg'),),
+                      image: NetworkImage('https://i.imgur.com/xihuley.jpg'),
+                      placeholder: NetworkImage('https://i.imgur.com/xihuley.jpg'),),
                   ),
                 )
             ),
@@ -134,8 +140,9 @@ class CuadradoDelMedio extends StatelessWidget {
 
                   for(var x in users){
                     Blob blob = x[10];
-                    print(blob.toBytes());
-                    logProvider.users.add(Usuario(id: x[0], name: x[1], apellido: x[6], dni: x[8], email: x[2], imagenQr: Uint8List.fromList(blob.toBytes()), codigoQr: x[9]));
+                    Utf8Encoder utfEncoder = const Utf8Encoder();
+                    print(utfEncoder.convert(blob.toString()));
+                    logProvider.users.add(Usuario(id: x[0], name: x[1], apellido: x[6], dni: x[8], email: x[2], imagenQr: utfEncoder.convert(blob.toString()), codigoQr: x[9]));
                   }
                   String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
                       '#0791e0',
@@ -156,8 +163,8 @@ class CuadradoDelMedio extends StatelessWidget {
                 child: Container(
                     constraints: const BoxConstraints(maxHeight: 50),
                     child: const FadeInImage(
-                        placeholder: AssetImage('assets/codigo-qr.png'),
-                        image: AssetImage('assets/codigo-qr.png'))),
+                        placeholder: NetworkImage('https://i.imgur.com/c9wAZSl.png'),
+                        image: NetworkImage('https://i.imgur.com/c9wAZSl.png'))),
               ),
             )
           ],

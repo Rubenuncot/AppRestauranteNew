@@ -49,7 +49,27 @@ class _HomeScreenState extends State<HomeScreen> {
   String mesaActual = '';
 
   /* Métodos */
-  void showDialogMenu() {
+  void showDialogMenu() async {
+    
+    dynamic listRes = await DBConnection.rawQuery('Select * from res_menu_diarios');
+    List primeros = [];
+    List segundos = [];
+    List postres = [];
+
+    for(var x in listRes){
+      switch(x[2]){
+        case 'Primeros':
+          primeros.add(x[1]);
+          break;
+        case 'Segundos':
+          segundos.add(x[1]);
+          break;
+        case 'Postres':
+          postres.add(x[1]);
+          break;
+      }
+    }
+    
     showDialog(
       context: context,
       builder: (context) => FluidDialog(
@@ -97,33 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Center(
-                          child: Text(
-                            'Tortilla de patatas',
-                            style: GoogleFonts.manjari(fontSize: 15),
+                        for(var x in primeros)
+                          Center(
+                            child: Text(
+                              x,
+                              style: GoogleFonts.manjari(fontSize: 15),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Text(
-                            'Paella',
-                            style: GoogleFonts.manjari(fontSize: 15),
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Text(
-                            'Cocido extremeño',
-                            style: GoogleFonts.manjari(fontSize: 15),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+
                         const Divider(),
                         Center(
                           child: Text(
@@ -134,33 +138,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Center(
-                          child: Text(
-                            'Calamares a la plancha',
-                            style: GoogleFonts.manjari(fontSize: 15),
+                        for(var x in segundos)
+                          Center(
+                            child: Text(
+                              x,
+                              style: GoogleFonts.manjari(fontSize: 15),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Text(
-                            'Solomillo a la plancha',
-                            style: GoogleFonts.manjari(fontSize: 15),
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Text(
-                            'Cazón en adobo',
-                            style: GoogleFonts.manjari(fontSize: 15),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
                         const Divider(),
                         Center(
                           child: Text(
@@ -171,33 +158,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Center(
-                          child: Text(
-                            'Tarta de arándanos',
-                            style: GoogleFonts.manjari(fontSize: 15),
+                        for(var x in postres)
+                          Center(
+                            child: Text(
+                              x,
+                              style: GoogleFonts.manjari(fontSize: 15),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Text(
-                            'Helado de vainilla con sirope',
-                            style: GoogleFonts.manjari(fontSize: 15),
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Text(
-                            'Tarta de queso casera',
-                            style: GoogleFonts.manjari(fontSize: 15),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
                         const Divider(),
                         const SizedBox(
                           height: 20,
@@ -354,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadowColor: const Color.fromARGB(255, 95, 211, 0),
         subTitle: '',
         title: 'Salas',
-        image: 'assets/silla.png',
+        image: 'https://i.imgur.com/mjLRpmx.png',
         textShadowColor: const Color.fromARGB(255, 171, 255, 168),
         textColor: Colors.white,
         onTap: () {
@@ -369,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadowColor: const Color.fromARGB(255, 211, 176, 0),
         subTitle: '',
         title: 'Menú del Día',
-        image: 'assets/menuDelDia.png',
+        image: 'https://i.imgur.com/C5FbGZb.png',
         textShadowColor: const Color.fromARGB(255, 255, 248, 168),
         textColor: Colors.white,
         onTap: showDialogMenu,
@@ -382,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadowColor: const Color.fromARGB(255, 158, 0, 211),
         subTitle: '',
         title: 'Carta',
-        image: 'assets/carta.png',
+        image: 'https://i.imgur.com/O8MHtc1.png',
         textShadowColor: const Color.fromARGB(255, 193, 168, 255),
         textColor: Colors.white,
         onTap: () {
@@ -413,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
         subTitle: '',
         // subTitle: 'Día: ${DateTime.now().day < 10 ? '0${DateTime.now().day}' : DateTime.now().day} / ${DateTime.now().month < 10 ? '0${DateTime.now().month}' : DateTime.now().month} / ${DateTime.now().year}',
         title: 'Ajustes',
-        image: 'assets/ajustes.png',
+        image: 'https://i.imgur.com/TJTLXpO.png',
         textShadowColor: const Color.fromARGB(255, 255, 25, 80),
         textColor: Colors.white,
         onTap: () {
@@ -433,7 +403,7 @@ class _HomeScreenState extends State<HomeScreen> {
         subTitle: '',
         // subTitle: 'Día: ${DateTime.now().day < 10 ? '0${DateTime.now().day}' : DateTime.now().day} / ${DateTime.now().month < 10 ? '0${DateTime.now().month}' : DateTime.now().month} / ${DateTime.now().year}',
         title: 'Cerrar Sesión',
-        image: 'assets/cerrar-sesion.png',
+        image: 'https://i.imgur.com/HqeTzRh.png',
         textShadowColor: const Color.fromARGB(255, 25, 90, 255),
         textColor: Colors.white,
         onTap: () {
@@ -516,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemCount: listCarrousel.length,
                               itemBuilder: (context, index) => SizedBox( width: MediaQuery.of(context).size.width * 0.4, child: listCarrousel.reversed.toList()[index]),)
                                 : CustomContainer(
-                              image: 'assets/ajustes.png',
+                              image: 'https://i.imgur.com/TJTLXpO.png',
                               gradientColors: const [Colors.orange, Colors.yellow],
                               textShadowColor: Colors.white,
                               boxShadowColor: Colors.white,

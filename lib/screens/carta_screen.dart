@@ -6,6 +6,7 @@ import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_dialogs/dialogs.dart';
+import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:provider/provider.dart';
 import 'package:prueba_widgets/database/models/familia.dart';
@@ -101,7 +102,7 @@ class _CartaScreenState extends State<CartaScreen> with WidgetsBindingObserver {
           idTipo: x[5]));
     }
     for (var x in familiasRes) {
-      familiasTipo.add(Familia(id: x[0], nombre: x[1]));
+      familiasTipo.add(Familia(id: x[0], nombre: x[1], icono: x[2]));
     }
     for (var x in lineasComandasRes) {
       lineasComandas.add(LineasComanda(
@@ -123,7 +124,7 @@ class _CartaScreenState extends State<CartaScreen> with WidgetsBindingObserver {
             Color.fromARGB(255, 103, 128, 255)
           ],
           boxShadowColor: const Color.fromARGB(255, 255, 103, 247),
-          image: 'assets/lata-de-refresco.png',
+          image: familia.icono,
           textShadowColor: const Color.fromARGB(255, 246, 255, 168),
           textColor: Colors.white,
           onTap: () {
@@ -213,10 +214,22 @@ class _CartaScreenState extends State<CartaScreen> with WidgetsBindingObserver {
         }
         Dialogs.materialDialog(
             title: prodTemp.nombre,
-            msg:
-                'Precio: ${prodTemp.precio}, Descripción: ${prodTemp.descripcion}',
+            customViewPosition: CustomViewPosition.BEFORE_ACTION,
+            customView: Column(
+              children: [
+                const Text('Precio: ', style: TextStyle(fontWeight: FontWeight.bold),),
+                const SizedBox(height: 5,),
+                Text('${prodTemp.precio}'),
+                const SizedBox(height: 10,),
+                const Text('Descripción: ', style: TextStyle(fontWeight: FontWeight.bold),),
+                const SizedBox(height: 5,),
+                Text('${prodTemp.descripcion}'),
+              ],
+            ),
             actions: [
               IconsButton(
+                color: Colors.redAccent,
+                  iconData: Icons.close,
                   onPressed: () => Navigator.pop(context) ,
                   text: 'Cerrar'
               )
@@ -227,7 +240,13 @@ class _CartaScreenState extends State<CartaScreen> with WidgetsBindingObserver {
     });
 
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pop(context),
+        elevation: 0,
+        backgroundColor: Colors.redAccent,
+        heroTag: Provider.of<SalasProvider>(context, listen: false).heroMesa,
+        child: const Icon(Icons.arrow_back),
+      ),
       body: SafeArea(
         child: Column(
           children: [
